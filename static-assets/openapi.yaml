@@ -1,0 +1,3642 @@
+openapi: 3.1.0
+info:
+  title: Investor Search API
+  description: An API that allows users to search for investors.
+  version: "v1"
+servers:
+  - url: http://localhost:5003
+paths:
+  /app/etoro-app-map.json:
+    get:
+      operationId: etoroAppPaths
+      summary: etoro app paths for different activities like see instruments charts, news, stats. users portfolios, stats. earning report dates and more
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getPathsResponse"
+  /api/search/v1/{entity}:
+    get:
+      operationId: searchInstrumentOrInvestors
+      summary: search for instruments or investors to extract their instrument id or users user names, gcid and cid. shows how many investors, copiers and followers they have.
+      parameters:
+        - in: path
+          name: entity
+          schema:
+            type: string
+            enum: ["instruments", "users"]
+          required: true
+          description: in case you need to specify instrument search or user search, if not in the string will return both users and instruments
+        - name: startIndex
+          in: query
+          description: The first result index
+          required: true
+          schema:
+            type: number
+            default: 0
+        - name: usersCount
+          in: query
+          description: number of users to return in the result
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: instrumentsCount
+          in: query
+          description: number of instruments to return in the result
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: count
+          in: query
+          description: total number to return in the result
+          required: true
+          schema:
+            type: number
+            default: 5
+        - name: prefix
+          in: query
+          description: the search query for example aapl
+          required: true
+          schema:
+            type: string
+        - name: format
+          in: query
+          description: format of the response
+          required: true
+          schema:
+            type: string
+            enum: ["json"]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getSearchResponse"
+  /sapi/userstats/portfolio/username/{username}/live:
+    get:
+      operationId: getUserPortfolio
+      summary: |
+        get public user porfolio and show how the user portfolio is divided, using that method you can analiyze porfolio risks, diversity and more
+      parameters:
+        - in: path
+          name: username
+          schema:
+            type: string
+          required: true
+          description: the username of the required user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserPublicPortfolio"
+  /sapi/instrumentsmetadata/V1.1/instruments/{instrumentId}:
+    get:
+      operationId: getInstrument
+      summary: Get Instrument base info
+      parameters:
+        - in: path
+          name: instrumentId
+          schema:
+            type: number
+          required: true
+          minimum: 1
+          maximum: 99999999
+          description: The id of the instrument if not exists will return all instruments metadata
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getInstrumentResponse"
+  /sapi/trade-real/rates/{instrumentId}:
+    get:
+      operationId: getInstrumentPrice
+      summary: Get Instrument Price
+      parameters:
+        - in: path
+          name: instrumentId
+          schema:
+            type: number
+          required: true
+          description: The id of the instrument
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getRateResponse"
+  /sapi/rankings/rankings/:
+    get:
+      operationId: searchInvestors
+      summary: Search for investors
+      parameters:
+        - name: period
+          in: query
+          description: The period to search for
+          required: true
+          schema:
+            type: string
+            enum:
+              [
+                "CurrMonth",
+                "OneMonthAgo",
+                "TwoMonthsAgo",
+                "CurrQuarter",
+                "ThreeMonthsAgo",
+                "SixMonthsAgo",
+                "CurrYear",
+                "OneYearAgo",
+                "LastYear",
+                "LastTwoYears",
+              ]
+        - name: blocked
+          in: query
+          description: Whether the investor is blocked
+          required: true
+          schema:
+            type: boolean
+            default: false
+        - name: istestaccount
+          in: query
+          description: Whether the account is a test account
+          required: true
+          schema:
+            type: boolean
+            default: false
+        - name: hasavatar
+          in: query
+          description: Whether the investor has an avatar
+          required: false
+          schema:
+            type: boolean
+            default: true
+        - name: copyblock
+          in: query
+          description: Whether the investor has copyblock enabled
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - name: optin
+          in: query
+          description: Opt-in status
+          required: true
+          schema:
+            type: boolean
+            default: true
+        - name: aumtiermin
+          in: query
+          description: Minimum AUM tier
+          required: false
+          schema:
+            type: integer
+        - name: aumtiermax
+          in: query
+          description: Maximum AUM tier
+          required: false
+          schema:
+            type: integer
+        - name: aumtierv2min
+          in: query
+          description: Minimum AUM tier
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+        - name: aumtierv2max
+          in: query
+          description: Maximum AUM tier
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 8
+        - name: dailyddmin
+          in: query
+          description: Minimum daily drawdown (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: dailyddmax
+          in: query
+          description: Maximum daily drawdown (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: weeklyddmin
+          in: query
+          description: Minimum weekly drawdown (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: weeklyddmax
+          in: query
+          description: Maximum weekly drawdown (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: peaktovalleymax
+          in: query
+          description: Maximum peak to valley (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: peaktovalleymin
+          in: query
+          description: Minimum peak to valley (value should be multiplied by -1)
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: avgpossizemin
+          in: query
+          description: Minimum average position size
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: avgpossizemax
+          in: query
+          description: Maximum average position size
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: gainmin
+          in: query
+          description: Minimum gain
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -100
+            maximum: 999999
+        - name: gainmax
+          in: query
+          description: Maximum gain
+          required: false
+          schema:
+            type: number
+            format: float
+            minimum: -100
+            maximum: 999999
+        - name: dailygainmin
+          in: query
+          description: Minimum daily gain
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: dailygainmax
+          in: query
+          description: Maximum daily gain
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: thisweekgainmin
+          in: query
+          description: Minimum gain this week
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: thisweekgainmax
+          in: query
+          description: Maximum gain this week
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copiersmin
+          in: query
+          description: Minimum number of copiers
+          required: false
+          schema:
+            type: integer
+        - name: copiersmax
+          in: query
+          description: Maximum number of copiers
+          required: false
+          schema:
+            type: integer
+        - name: copiedtradesmin
+          in: query
+          description: Minimum number of copied trades
+          required: false
+          schema:
+            type: integer
+        - name: copiedtradesmax
+          in: query
+          description: Maximum number of copied trades
+          required: false
+          schema:
+            type: integer
+        - name: copytradespctmin
+          in: query
+          description: Minimum percentage of copy trades
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copytradespctmax
+          in: query
+          description: Maximum percentage of copy trades
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copyinvestmentpctmin
+          in: query
+          description: Minimum percentage of copy investment
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copyinvestmentpctmax
+          in: query
+          description: Maximum percentage of copy investment
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copiersgainmin
+          in: query
+          description: Minimum gain of copiers
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: copiersgainmax
+          in: query
+          description: Maximum gain of copiers
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: country
+          in: query
+          description: Country id from the Country model
+          required: false
+          schema:
+            type: integer
+        - name: tradesmin
+          in: query
+          description: Minimum number of trades
+          required: false
+          schema:
+            type: integer
+        - name: tradesmax
+          in: query
+          description: Maximum number of trades
+          required: false
+          schema:
+            type: integer
+        - name: winratiomin
+          in: query
+          description: Minimum win ratio
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: winratiomax
+          in: query
+          description: Maximum win ratio
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: profitablemonthspctmin
+          in: query
+          description: Minimum percentage of profitable months
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: profitablemonthspctmax
+          in: query
+          description: Maximum percentage of profitable months
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: profitableweekspctmin
+          in: query
+          description: Minimum percentage of profitable weeks
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: profitableweekspctmax
+          in: query
+          description: Maximum percentage of profitable weeks
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: velocitymin
+          in: query
+          description: Minimum velocity
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: velocitymax
+          in: query
+          description: Maximum velocity
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: exposuremin
+          in: query
+          description: Minimum exposure
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: exposuremax
+          in: query
+          description: Maximum exposure
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: highleveragepctmin
+          in: query
+          description: Minimum high leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: highleveragepctmax
+          in: query
+          description: Maximum high leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: mediumleveragepctmin
+          in: query
+          description: Minimum medium leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: mediumleveragepctmax
+          in: query
+          description: Maximum medium leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: lowleveragepctmin
+          in: query
+          description: Minimum low leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: lowleveragepctmax
+          in: query
+          description: Maximum low leverage percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: activeweeksmin
+          in: query
+          description: Minimum active weeks
+          required: false
+          schema:
+            type: integer
+        - name: activeweeksmax
+          in: query
+          description: Maximum active weeks
+          required: false
+          schema:
+            type: integer
+        - name: instrumentid
+          in: query
+          description: instrument id for instrument. for asset types Cryptocurrencies=-10, Currencies=-1, Commodities=-2, Indices=-4, Stocks=-5 and ETF=-6. for multiple use comma seperator
+          required: false
+          schema:
+            type: integer
+        - name: instrumentpctmin
+          in: query
+          description: Minimum instrument percentage
+          required: false
+          schema:
+            type: number
+            format: float
+            maximum: 100
+        - name: instrumentpctmax
+          in: query
+          description: Maximum instrument percentage
+          required: false
+          schema:
+            type: number
+            format: float
+            maximum: 100
+        - name: sort
+          in: query
+          description: Sort field (prefix with '-' for descending order)
+          required: false
+          schema:
+            type: string
+        - name: baselinecopiersmin
+          in: query
+          description: Minimum baseline copiers
+          required: false
+          schema:
+            type: integer
+        - name: baselinecopiersmax
+          in: query
+          description: Maximum baseline copiers
+          required: false
+          schema:
+            type: integer
+        - name: riskscore
+          in: query
+          description: Risk score (1-7)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 7
+        - name: maxmonthlyriskscore
+          in: query
+          description: Maximum monthly risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 7
+        - name: verified
+          in: query
+          description: Whether the investor is verified
+          required: false
+          schema:
+            type: boolean
+        - name: popularinvestor
+          in: query
+          description: Whether the investor is a popular investor
+          required: false
+          schema:
+            type: boolean
+        - name: riskscoremin
+          in: query
+          description: Minimum risk score (1-7)
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 7
+        - name: riskscoremax
+          in: query
+          description: Maximum risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+        - name: maxdailyriskscoremin
+          in: query
+          description: Minimum maximum daily risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+        - name: maxdailyriskscoremax
+          in: query
+          description: Maximum maximum daily risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+        - name: maxmonthlyriskscoremin
+          in: query
+          description: Minimum maximum monthly risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+        - name: maxmonthlyriskscoremax
+          in: query
+          description: Maximum maximum monthly risk score
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 10
+        - name: lastactivitymin
+          in: query
+          description: Minimum last activity percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: lastactivitymax
+          in: query
+          description: Maximum last activity percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: toptradedassetclassid
+          in: query
+          description: Top traded asset class ID
+          required: false
+          schema:
+            type: integer
+        - name: longpospctmin
+          in: query
+          description: Minimum long position percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: longpospctmax
+          in: query
+          description: Maximum long position percentage
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: firstactivitymax
+          in: query
+          description: Maximum first activity
+          required: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rankingsResponse"
+  /sapi/rankings/cid/{userCid}/rankings:
+    get:
+      operationId: getInvestorStats
+      summary: get specific investor using his cid as userId
+      parameters:
+        - name: userCid
+          in: path
+          description: The user cid
+          required: true
+          schema:
+            type: number
+        - name: period
+          in: query
+          description: The period to search for
+          required: true
+          schema:
+            type: string
+            enum:
+              [
+                "CurrMonth",
+                "OneMonthAgo",
+                "TwoMonthsAgo",
+                "CurrQuarter",
+                "ThreeMonthsAgo",
+                "SixMonthsAgo",
+                "CurrYear",
+                "OneYearAgo",
+                "LastYear",
+                "LastTwoYears",
+              ]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rankingsResponse"
+  /sapi/candles/candles/desc.json/{period}/{candlesNumber}/{instrumentId}:
+    get:
+      operationId: getInstrumentsCandles
+      summary: get instruments prices using candles data including range low,high,open and close
+      parameters:
+        - in: path
+          name: period
+          schema:
+            type: string
+            enum:
+              [
+                "OneMinute",
+                "FiveMinutes",
+                "TenMinutes",
+                "FifteenMinutes",
+                "OneHour",
+                "OneDay",
+                "OneWeek",
+              ]
+          required: true
+          description: the time frame of the candles
+        - name: candlesNumber
+          in: path
+          description: amount of candles to return
+          required: true
+          schema:
+            type: number
+            default: 30
+        - name: instrumentId
+          in: path
+          description: etoro instrument id
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/candlesResponse"
+  #/sapi/instrumentsinfo/instruments/{instrumentId}:
+  /sapi/instrumentsinfo/instruments/symbol/{symbolFull}:
+    get:
+      operationId: getInstrumentInfo
+      summary: |
+        Instrument and company extended info including financal status, earning reports, growth, analysis, market cap, estimatedEPS, price changes, investors changes and more.
+        pay attention to all fields options and choose the best fits. note: next earning report date is in field named nextEarningDate.
+      parameters:
+        - in: path
+          name: symbolFull
+          schema:
+            type: string
+          required: true
+          description: The symbol of the instrument
+        # - in: path
+        #   name: instrumentId
+        #   schema:
+        #     type: number
+        #   required: true
+        #   minimum: 1
+        #   maximum: 99999999
+        #   description: The id of the instrument
+        - in: query
+          name: fields
+          description: to optimize the response to include only the desired fields. important - limit to 50 fields maxinmum note that next earning report date is in field named nextEarningDate.
+          required: true
+          schema:
+            type: string
+            enum: ["internalIndustryId","internalAssetClassId","internalInstrumentDisplayName","isInternalInstrument","internalSymbolFull","isHiddenFromClient","internalInstrumentId","internalCryptoTypeId","internalExchangeId","internalExchangeName","internalStockIndustryName","internalAssetClassName","logo35x35","logo50x50","logo150x150","dailyPriceChange","absDailyPriceChange","weeklyPriceChange","monthlyPriceChange","isDelisted","isCurrentlyTradable","isExchangeOpen","internalClosingPrice","isActiveInPlatform","isBuyEnabled","currentRate","threeMonthPriceChange","sixMonthPriceChange","oneYearPriceChange","currMonthPriceChange","currQuarterPriceChange","currYearPriceChange","lastYearPriceChange","lastTwoYearsPriceChange","oneMonthAgoPriceChange","twoMonthsAgoPriceChange","threeMonthsAgoPriceChange","sixMonthsAgoPriceChange","oneYearAgoPriceChange","cvtBid","cvtAsk","cvtBiNoSpread","cvtAskNoSpread","traders7DayChange","traders14DayChange","traders30DayChange","popularityUniques7Day","popularityUniques14Day","popularityUniques30Day","stockBasedCompensationCashFlow-TTM","capitalExpendituresPerShare-Annual","cashDividendsOrCashFlow-Annual","cashFlowFromOperPerShareNet-Annual","saleOfCommonPreferredStock-TTM","saleOrMaturityOfInvestments-TTM","ipoDate","cashTaxesPaid-Annual","changeInLongTermDebt-Annual","commonDividends-Annual","interestPaidCashFlow-Annual","investingActivitiesOtherUses-Annual","repurchaseOfCommonPreferredStock-Annual","saleOfCommonPreferredStock-Annual","saleOrMaturityOfInvestments-Annual","stockBasedCompensationCashFlow-Annual","otherFinancingActivitiesUses-TTM","otherProceedsfromStockOptions-TTM","preferredDividendsCashFlow-TTM","proceedsFromStockOptions-TTM","purchaseOfInvestments-TTM","reductionOfLongTermDebt-TTM","repurchaseOfCommonPreferredStock-TTM","otherFinancingActivitiesUses-Annual","otherProceedsfromStockOptions-Annual","preferredDividendsCashFlow-Annual","proceedsFromStockOptions-Annual","purchaseOfInvestments-Annual","reductionOfLongTermDebt-Annual","tipranksConsensus","tipranksHighPriceTarget","tipranksLowPriceTarget","tipranksTargetPrice","tipranksTargetPriceCurrency","tipranksTargetPriceUpside","tipranksTotalAnalysts","10DayMovingAverage-Annual","10WeekMovingAverage-Annual","1YearAnnualRevenueGrowthRate-Annual","200DayMovingAverage-Annual","30WeekMovingAverage-Annual","3YearAnnualCapitalSpendingGrowthRate-Annual","3YearAnnualDividendGrowthRate-Annual","3YearAnnualIncomeGrowthRate-Annual","tipranksAnalystsSupportingBuy","tipranksAnalystsSupportingHold","tipranksAnalystsSupportingSell","issuanceOfLongTermDebt-Annual","tipRanksFourStarsAnalystExcessReturn","tipRanksFourStarsAnalystGoodRecommendations","tipRanksFourStarsAnalystName","tipRanksFourStarsAnalystPicture","tipRanksFourStarsAnalystPriceTarget","tipRanksFourStarsAnalystRank","tipRanksFourStarsAnalystsSupportingBuy","tipRanksFourStarsAnalystsSupportingHold","tipRanksFourStarsAnalystsSupportingSell","tipRanksFourStarsAnalystStars","tipRanksFourStarsAnalystStockAverageReturn","tipRanksFourStarsAnalystStockSuccessRate","tipRanksFourStarsAnalystSuccessRate","tipRanksFourStarsAnalystTotalRecommendations","tipRanksFourStarsConsensus","tipRanksFourStarsFirmName","tipRanksFourStarsHighPriceTarget","tipRanksFourStarsLowPriceTarget","tipRanksFourStarsRecommendation","tipRanksFourStarsRecommendationArticleUrl","tipRanksFourStarsRecommendationDate","tipRanksFourStarsTargetPriceCurrency","tipRanksFourStarsTargetPrice","issuerLevelCurrency-Annual","tipRanksFourStarsTotalAnalysts","3YearAnnualRAndDGrowthRate-Annual","3YearAnnualRevenueGrowthRate-Annual","50DayMovingAverage-Annual","5DayMovingAverage-Annual","5YearAnnualCapitalSpendingGrowthRate-Annual","5YearAnnualDividendGrowthRate-Annual","5YearAnnualIncomeGrowthRate-Annual","5YearAnnualRAndDGrowthRate-Annual","5YearAnnualRevenueGrowthRate-Annual","5YearAverageDebtEquityRatio-Annual","5YearAverageGrossProfitMargin-Annual","operatingIncomeAfterUnusualItems-Annual","operatingLeaseExpense-Annual","operatingMargin-Annual","otherAfterTaxAdjustments-Annual","priceToTangibleBookValue-TTM","propertyPlantEquipmentBuildings-TTM","provisionForRisksCharges-TTM","purchaseOrSaleOfInvestments-TTM","quickRatio-TTM","extraordinaryGainsOrLossesFromSaleOfAsset-TTM","extraordinaryItem-TTM","extraordinaryItemsIncludingAccountingChange-TTM","factSetCompanyEntityID-TTM","faxNumber-TTM","fiscalPeriodEndDate-TTM","fiscalPeriodLengthDays-TTM","fiscalPeriodStartDate-TTM","float-TTM","floatAsPercentOfSharesOutstanding-TTM","floatCurrent-TTM","freeCashFlow-TTM","freeCashFlowPerShareDiluted-TTM","arabesqueIsDefence","arabesqueIsFirearms","arabesqueIsFossilFuels","arabesqueIsGambling","arabesqueIsGMO","arabesqueIsNuclear","arabesqueIsPork","arabesqueIsRecreationalDrugs","arabesqueIsStemCells","arabesqueIsThermalCoal","arabesqueIsTobacco","issuerLevelCurrency-TTM","arabesqueESGEnvironment","arabesqueESGGovernance","arabesqueESGSocial","arabesqueESGTotal","arabesqueGlobalCompactAnti-Corruption","arabesqueGlobalCompactEnvironment","arabesqueGlobalCompactTotal","arabesqueHumanRights","arabesqueLabourRights","arabesqueControversialWeaponsReason","arabesqueIsAdultEntertainment","arabesqueIsAlcohol","arabesqueIsControversialWeapons","peRatio-TTM-FiveYearsAgo","peRatioFiscal-TTM-ThreeMonthsAgo","peRatioFiscal-TTM-SixMonthsAgo","peRatioFiscal-TTM-OneYearAgo","peRatioFiscal-TTM-FiveYearsAgo","peRatioSecurity-TTM-ThreeMonthsAgo","peRatioSecurity-TTM-SixMonthsAgo","highPriceLast26Weeks-Annual","highPriceLast3Months-Annual","highPriceLast4Weeks-Annual","highPriceLast52Weeks-Annual","highPriceLast6Months-Annual","highPriceLast9Months-Annual","highPriceMTD-Annual","highPriceYTD-Annual","incomeTaxes-Annual","industry-Annual","industryName-Annual","instrumentClass-Annual","deferredTaxesInvestmentTaxCredit-Annual","deferredTaxLiabilities-Annual","depreciationAmortization-Annual","depreciationDepletionAmortizationCashFlow-Annual","depreciationOrDepletion-Annual","dividendExDate-Annual","dividendPayoutRatio-Annual","dividendRate-Annual","dividendsPerShareLTMSecurity-Annual","deferredTaxes-Annual","deferredTaxesExcludingInvestmentTaxCredits-Annual","beta60Month-Annual","bookValue-Annual","bookValuePerShare-Annual","businessDescription-Annual","shortBio-ru-ru","5YearHighPrice-Annual","5YearLowPERatio-Annual","5YearLowPrice-Annual","accountsPayable-Annual","accountsPayableCashFlow-Annual","accountsReceivableCashFlow-Annual","accountsReceivablesDays-Annual","accountsReceivablesNet-Annual","accruedExpenses-Annual","accumulatedDepreciation-Annual","accumulatedMinorityInterest-Annual","accumulatedOtherCompensationIncomeOtherAdjustments-Annual","5YearHighPERatio-TTM","5YearHighPrice-TTM","5YearLowPERatio-TTM","5YearLowPrice-TTM","accountsPayable-TTM","accountsPayableCashFlow-TTM","accountsReceivableCashFlow-TTM","accountsReceivablesDays-TTM","accountsReceivablesNet-TTM","accruedExpenses-TTM","accumulatedDepreciation-TTM","accumulatedMinorityInterest-TTM","averageDailyVolumeLast9Months-TTM","averageDailyVolumeLastMonth-TTM","averageDailyVolumeYTD-TTM","beta-TTM","beta12Month-TTM","beta60Month-TTM","bookValue-TTM","bookValuePerShare-TTM","businessDescription-TTM","capitalExpenditures-TTM","capitalExpendituresFixedAssets-TTM","cashDividendsPaid-TTM","cashEquivalentsGeneric-TTM","cashFlowPerShare-TTM","cashPerShare-TTM","cashShortTermInvestments-TTM","ceO-TTM","changeInCapitalStock-TTM","changeInCurrentDebt-TTM","cashFlowPerShare-Annual","cashPerShare-Annual","cashShortTermInvestments-Annual","ceO-Annual","changeInCapitalStock-Annual","changeInCurrentDebt-Annual","changesInWorkingCapital-Annual","city-Annual","commonSharesOutstandingSecurity-Annual","commonSharesUsedToCalculateEPSFullyDiluted-Annual","sectorNameId","peRatio-TTM","peRatioFiscal-TTM","peRatioSecurity-TTM","percentOfSharesOutstandingHeldByInsiders-TTM","percentPriceChange10Days-TTM","percentPriceChange13Weeks-TTM","percentPriceChange1Week-TTM","percentPriceChange26Weeks-TTM","percentPriceChange2Weeks-TTM","percentPriceChange3Months-TTM","percentPriceChange4Weeks-TTM","totalDebt-TTM","totalDebtToEquityRatio-TTM","totalEnterpriseValue-TTM","totalEquity-TTM","totalExpenses-TTM","totalInvestedCapital-TTM","industryNameId","peRatioSecurity-TTM-FiveYearsAgo","peRatioSecurity-TTM-OneYearAgo","revenuePerShare-TTM","retainedEarnings-TTM","returnOnAssets-TTM","returnOnAverageTotalEquity-TTM","returnOnCommonEquity-TTM","daysSalesOutstandingTimeWeighted-TTM","rAndDAsPercentOfSales-TTM","receivablesPerDaySales-TTM","receivablesTurnover-TTM","researchAndDevelopment-TTM","reservesChange-TTM","longTermDebt-Annual","longTermDebtToEquityRatio-Annual","cumulativeTranslationAdjustment-TTM","currency-TTM","currentRatio-TTM","currentRevenuePerEmployee-TTM","dailyVolumeAsPercentOf10DayAverageVolume-TTM","dateOf52WeekHigh-TTM","dateOf52WeekLow-TTM","daysSalesOutstanding-TTM","numberOfEmployees-TTM-SixMonthsAgo","figiCode","numberOfEmployees-TTM-ThreeMonthsAgo","totalVolumeLast52Weeks-TTM","numberOfEmployees-TTM-OneYearAgo","numberOfEmployees-TTM-FiveYearsAgo","totalVolumeLast26Weeks-TTM","totalVolumeLast2Weeks-TTM","totalVolumeLast3Months-TTM","totalVolumeLast4Weeks-TTM","totalInvestmentsAndAdvances-TTM","totalInvestmentsBanks-TTM","totalLiabilities-TTM","totalLiabilitiesStockholdersEquity-TTM","totalOperatingExpenses-TTM","totalShareholdersEquity-TTM","totalVolume1Week-TTM","totalVolumeLast10Days-TTM","totalVolumeLast12Months-TTM","totalVolumeLast13Weeks-TTM","totalVolumeLast20Days-TTM","figiSecurityType","figiMarketSector","fiscalPeriod-Annual","fiscalPeriod-TTM","marketCapitalizationIssuerLevel-Annual","marketCapitalizationExcludingNonTradedAndTreasuryIssuerLevel-TTM","marketCapitalizationExcludingNonTradedIssuerLevel-TTM","marketCapitalizationExcludingTreasuryIssuerLevel-TTM","marketCapitalizationIssuerLevel-TTM","miscellaneousFunds-Annual","firstTradeDate","naicsCode-Annual","accountingStandardsFollowed-Annual","accountingStandardsFollowed-TTM","localName-ar-ae","longBio-ar-ae","shortBio-ar-ae","zipCode-TTM","workingCapital-TTM","workingCapitalPerShare-TTM","totalVolumeMTD-TTM","totalVolumeYTD-TTM","unusualExpense-TTM","website-TTM","weeklyVolumeAsPercentOfSharesOutstanding-TTM","marketCapitalizationFiscal-TTM","marketCapitalizationFullyDiluted-TTM","marketCapitalizationSecurity-TTM","minorityInterestExpense-TTM","miscellaneousFunds-TTM","naicsCode-TTM","netAssetsFromAcquisitions-TTM","netChangeInCash-TTM","netFinancingCashFlow-TTM","netGoodwill-TTM","netIncomeAfterExtraordinaryItems-TTM","netIncomeAvailableToCommonBasic-TTM","netIncomeCashFlow-TTM","netMargin-Annual","netMargin1YearGrowthRate-Annual","netMargin-TTM","netMargin1YearGrowthRate-TTM","peRatio-TTM-ThreeMonthsAgo","peRatio-TTM-SixMonthsAgo","peRatio-TTM-OneYearAgo","totalVolumeLast6Months-TTM","totalVolumeLast9Months-TTM","netAssetsFromAcquisitions-Annual","netChangeInCash-Annual","netFinancingCashFlow-Annual","netGoodwill-Annual","netIncomeAfterExtraordinaryItems-Annual","netIncomeAvailableToCommonBasic-Annual","netIncomeCashFlow-Annual","netIncomeContinuingOperations-Annual","netIncomeTotalOperations-Annual","instrumentLevelSector-Annual","intangibleAssets-Annual","interestExpense-Annual","inventories-Annual","inventoriesCashFlow-Annual","inventoriesFinishedGoods-Annual","inventoriesProgressPayments-Annual","inventoriesRawMaterials-Annual","inventoriesWorkInProgress-Annual","investmentInUnconsolidatedAffiliates-Annual","extraordinaryItem-Annual","shortBio-fr-fr","longBio-fr-fr","shortBio-es-es","longBio-es-es","localName-es-es","localName-en-gb","longBio-en-gb","shortBio-en-gb","localName-de-de","longBio-de-de","shortBio-de-de","longBio-cs","localName-cs","shortBio-cs","otherFunds-Annual","otherAssets-Annual","otherCurrentAssets-Annual","otherCurrentLiabilities-Annual","otherFinancingActivitiesSources-Annual","otherFinancingActivity-Annual","localName-pt-pt","shortBio-pt-pt","longBio-pt-pt","shortBio-pl-pl","longBio-pl-pl","localName-pl-pl","localName-nl-nl","shortBio-nl-nl","longBio-nl-nl","localName-nb-no","shortBio-nb-no","longBio-nb-no","longBio-it-it","localName-it-it","shortBio-it-it","localName-fr-fr","stateOfIncorporation-Annual","stockOptionCompensationExpense-Annual","workingCapital-Annual","workingCapitalPerShare-Annual","zipCode-Annual","10DayMovingAverage-TTM","10WeekMovingAverage-TTM","1YearAnnualRevenueGrowthRate-TTM","200DayMovingAverage-TTM","30WeekMovingAverage-TTM","3YearAnnualCapitalSpendingGrowthRate-TTM","3YearAnnualDividendGrowthRate-TTM","3YearAnnualIncomeGrowthRate-TTM","averageDailyPercentPriceChange4Weeks-TTM","5YearAverageNetProfitMargin-TTM","5YearAveragePERatio-TTM","5YearAveragePreTaxProfitMargin-TTM","5YearAverageRAndDAsPercentOfSales-TTM","5YearAverageReturnEquity-TTM","5YearAverageReturnOnAssets-TTM","5YearAverageReturnOnInvestedCapital-TTM","5YearAverageSGAndAAsPercentOfSales-TTM","5YearAverageTotalDebtEquityRatio-TTM","accumulatedOtherCompensationIncomeOtherAdjustments-TTM","address1-TTM","address2-TTM","amortizationOfIntangibleAssets-TTM","assetTurnover-TTM","auditorsOpinion-TTM","percentPriceChange26Weeks-Annual","percentPriceChange2Weeks-Annual","percentPriceChange3Months-Annual","percentPriceChange4Weeks-Annual","percentPriceChange52Weeks-Annual","percentPriceChange6Months-Annual","percentPriceChange9Months-Annual","percentPriceChangeMTD-Annual","percentPriceChangeYTD-Annual","phoneNumber-Annual","preferredDividends-Annual","preferredStockCarryingValue-Annual","pretaxIncome-Annual","nonOperatingIncomeExpense-TTM","numberOfEmployees-TTM","operatingIncome-TTM","operatingIncomeAfterUnusualItems-TTM","operatingLeaseExpense-TTM","operatingMargin-TTM","otherAfterTaxAdjustments-TTM","otherAssets-TTM","otherCurrentAssets-TTM","otherCurrentLiabilities-TTM","deferredTaxesInvestmentTaxCredit-TTM","deferredTaxLiabilities-TTM","depreciationAmortization-TTM","depreciationDepletionAmortizationCashFlow-TTM","depreciationOrDepletion-TTM","dividendExDate-TTM","dividendPayoutRatio-TTM","dividendRate-TTM","dividendsPerShareLTMSecurity-TTM","deferredTaxes-TTM","deferredTaxesExcludingInvestmentTaxCredits-TTM","beta24Month-TTM","beta36Month-TTM","changesInWorkingCapital-TTM","city-TTM","commonSharesOutstandingSecurity-TTM","commonSharesUsedToCalculateEPSFullyDiluted-TTM","commonStockParOrCarryValue-TTM","companyFoundedDate-TTM","companyName-TTM","consolidatedNetIncome-TTM","corporateLocation-TTM","costOfGoodsSold-TTM","commonStockParOrCarryValue-Annual","companyFoundedDate-Annual","companyName-Annual","consolidatedNetIncome-Annual","corporateLocation-Annual","dividendsPerShareSecurity-TTM","dividendYieldDaily-TTM","dividendYieldFiscal-TTM","dividendYieldSecurity-TTM","dollarVolume1Week-TTM","domicileIndicatorCode-TTM","earningsGrowth-TTM","ebitdA-TTM","ebitdaFromCashFlow-TTM","ebitdaMargin-TTM","ebitMargin-TTM","ebitOperatingIncome-TTM","averageDailyPercentVolumeChange4Weeks-TTM","averageDailyVolumeLast10Days-TTM","averageDailyVolumeLast12Months-TTM","averageDailyVolumeLast13Weeks-TTM","averageDailyVolumeLast20Days-TTM","averageDailyVolumeLast26Weeks-TTM","averageDailyVolumeLast2Weeks-TTM","averageDailyVolumeLast3Months-TTM","averageDailyVolumeLast4Weeks-TTM","averageDailyVolumeLast52Weeks-TTM","averageDailyVolumeLast6Months-TTM","longTermDebtToTotalCapital-TTM","longTermNoteReceivable-TTM","lowPriceLast13Weeks-TTM","lowPriceLast26Weeks-TTM","lowPriceLast3Months-TTM","lowPriceLast4Weeks-TTM","lowPriceLast52Weeks-TTM","lowPriceLast6Months-TTM","lowPriceLast9Months-TTM","lowPriceMTD-TTM","lowPriceYTD-TTM","marketCapitalization-TTM","longBusinessDescription-TTM","longTermDebt-TTM","longTermDebtToEquityRatio-TTM","investmentInUnconsolidatedAffiliates-TTM","investmentsLongTermReceivables-TTM","investorRelationsEmail-TTM","isoCountryCode-TTM","issuanceOrReductionOfDebtNet-TTM","lastClose-TTM","lastHigh-TTM","lastLow-TTM","lastOpen-TTM","lastTradeDate-TTM","lastVolume-TTM","latestCloseAsPercentOf10DayAverage-TTM","latestCloseAsPercentOf10WeekAverage-TTM","latestCloseAsPercentOf200DayAverage-TTM","latestCloseAsPercentOf30WeekAverage-TTM","latestCloseAsPercentOf52WeekHigh-TTM","latestCloseAsPercentOf52WeekLow-TTM","latestCloseAsPercentOf5DayAverage-TTM","latestCloseAsPercentOf5YearHigh-TTM","latestCloseAsPercentOf5YearLow-TTM","estimatedYearlySales","fiscalPeriod","estimatedYearlyEPS","estimatedQuarterlyEPS","estimatedQuarterlySales","estimatedEPS","shortBio-th-th","isin","sedol","cusip","shortBio-fi-fi","longBio-fi-fi","longBio-th-th","localName-th-th","localName-fi-fi","fixedChargeCoverageRatio-TTM","cik","capitalExpendituresPerShare-TTM","cashDividendsOrCashFlow-TTM","cashFlowFromOperPerShareNet-TTM","cashTaxesPaid-TTM","changeInLongTermDebt-TTM","commonDividends-TTM","interestPaidCashFlow-TTM","investingActivitiesOtherUses-TTM","issuanceOfLongTermDebt-TTM","highPriceLast26Weeks-TTM","highPriceLast3Months-TTM","highPriceLast4Weeks-TTM","highPriceLast52Weeks-TTM","highPriceLast6Months-TTM","highPriceLast9Months-TTM","highPriceMTD-TTM","highPriceYTD-TTM","incomeTaxes-TTM","netIncomeContinuingOperations-TTM","netIncomeTotalOperations-TTM","netInvestingCashFlow-TTM","netOperatingCashFlow-TTM","netPropertyPlantEquipment-TTM","nonEquityReserves-TTM","nonOperatingExpense-TTM","latestCloseAsPercentOf200DayAverage-Annual","latestCloseAsPercentOf30WeekAverage-Annual","latestCloseAsPercentOf52WeekHigh-Annual","latestCloseAsPercentOf52WeekLow-Annual","latestCloseAsPercentOf5DayAverage-Annual","latestCloseAsPercentOf5YearHigh-Annual","latestCloseAsPercentOf5YearLow-Annual","leverageRatio-Annual","longBusinessDescription-Annual","longBio-ro-ro","localName-ro-ro","shortBio-da-dk","localName-ms-my","localName-da-dk","longBio-da-dk","longBio-ms-my","shortBio-ms-my","localName-en-us","shortBio-en-us","longBio-en-us","shortBio-cs-cz","longBio-cs-cz","localName-cs-cz","historicDividends","longBio-ms","localName-ro","longBio-da","longBio-ro","shortBio-da","shortBio-ms","shortBio-ro","longTermDebtToTotalCapital-Annual","longTermNoteReceivable-Annual","lowPriceLast13Weeks-Annual","lowPriceLast26Weeks-Annual","investmentsLongTermReceivables-Annual","investorRelationsEmail-Annual","isoCountryCode-Annual","issuanceOrReductionOfDebtNet-Annual","lastClose-Annual","lastHigh-Annual","lastLow-Annual","lastOpen-Annual","lastTradeDate-Annual","lastVolume-Annual","latestCloseAsPercentOf10DayAverage-Annual","latestCloseAsPercentOf10WeekAverage-Annual","totalVolumeYTD-Annual","unusualExpense-Annual","website-Annual","weeklyVolumeAsPercentOfSharesOutstanding-Annual","totalEquity-Annual","totalExpenses-Annual","totalInvestedCapital-Annual","totalInvestmentsAndAdvances-Annual","totalInvestmentsBanks-Annual","totalLiabilities-Annual","totalLiabilitiesStockholdersEquity-Annual","totalOperatingExpenses-Annual","totalShareholdersEquity-Annual","totalVolume1Week-Annual","totalVolumeLast10Days-Annual","totalVolumeLast12Months-Annual","totalVolumeLast13Weeks-Annual","totalVolumeLast20Days-Annual","totalVolumeLast26Weeks-Annual","totalVolumeLast2Weeks-Annual","totalVolumeLast3Months-Annual","totalVolumeLast4Weeks-Annual","totalVolumeLast52Weeks-Annual","totalVolumeLast6Months-Annual","totalVolumeLast9Months-Annual","totalVolumeMTD-Annual","earningConfirmationDate","earningEstimateChangeAverage","shortBio-vi-vn","longBio-vi-vn","investorRelationsUrl","fixedChargeCoverageRatio-Annual","localName-vi-vn","interestExpense-TTM","inventories-TTM","inventoriesCashFlow-TTM","inventoriesFinishedGoods-TTM","inventoriesProgressPayments-TTM","inventoriesRawMaterials-TTM","inventoriesWorkInProgress-TTM","equityInEarningsOfAffiliatesIncome-Annual","extraordinaryGainsOrLossesFromSaleOfAsset-Annual","generalIndustryClassification-Annual","grossIncome-Annual","industry-TTM","industryName-TTM","instrumentClass-TTM","instrumentLevelSector-TTM","intangibleAssets-TTM","extraordinaryItemsIncludingAccountingChange-Annual","factSetCompanyEntityID-Annual","faxNumber-Annual","filingStatus-Annual","fiscalPeriodEndDate-Annual","fiscalPeriodLengthDays-Annual","fiscalPeriodStartDate-Annual","float-Annual","floatAsPercentOfSharesOutstanding-Annual","floatCurrent-Annual","freeCashFlow-Annual","freeCashFlowPerShareDiluted-Annual","fundsFromOperations-Annual","conferenceCallTime","dividendAnnouncementDate","dividendFrequency","dividendStatus","dividendPayDate","dividendRecordDate","lastXDividendDate","nextEDFiscalYear","originalCurrency","originalCurrencyAmount","replayDate","replayWebcastURL","transcriptFiscalYear","xDividend","averageDailyVolumeLast52Weeks-Annual","averageDailyVolumeLast6Months-Annual","averageDailyVolumeLast9Months-Annual","averageDailyVolumeLastMonth-Annual","averageDailyVolumeYTD-Annual","beta-Annual","beta12Month-Annual","beta24Month-Annual","beta36Month-Annual","grossIncomeMargin-Annual","highPriceLast13Weeks-Annual","ebitPerShare-Annual","epS-Annual","epsBasicBeforeExtraordinaries-Annual","epsDilutedBeforeUnusualExpense-Annual","epsFromContinuingOperations-Annual","epsFullyDiluted-Annual","epsSecurity-Annual","capitalExpenditures-Annual","capitalExpendituresFixedAssets-Annual","cashDividendsPaid-Annual","cashEquivalentsGeneric-Annual","costOfGoodsSold-Annual","cumulativeTranslationAdjustment-Annual","currency-Annual","currentRatio-Annual","currentRevenuePerEmployee-Annual","dailyVolumeAsPercentOf10DayAverageVolume-Annual","dateOf52WeekHigh-Annual","dateOf52WeekLow-Annual","daysSalesOutstanding-Annual","daysSalesOutstandingTimeWeighted-Annual","dividendsPerShareSecurity-Annual","dividendYieldDaily-Annual","dividendYieldFiscal-Annual","dividendYieldSecurity-Annual","dollarVolume1Week-Annual","domicileIndicatorCode-Annual","earningsGrowth-Annual","ebitdA-Annual","ebitdaFromCashFlow-Annual","ebitdaMargin-Annual","ebitMargin-Annual","ebitOperatingIncome-Annual","shortTermReceivables-TTM","sicCode-TTM","state-TTM","stateOfIncorporation-TTM","stockOptionCompensationExpense-TTM","tangibleBookValuePerShare-TTM","tangibleOtherAssets-TTM","totalAssets-TTM","totalCash-TTM","totalCommonEquity-TTM","totalCurrentAssets-TTM","totalCurrentLiabilities-TTM","percentPriceChange52Weeks-TTM","percentPriceChange6Months-TTM","percentPriceChange9Months-TTM","percentPriceChangeMTD-TTM","percentPriceChangeYTD-TTM","phoneNumber-TTM","preferredDividends-TTM","preferredStockCarryingValue-TTM","pretaxIncome-TTM","preTaxInterestCoverageRatio-TTM","preTaxProfitMargin-TTM","priceToBook-TTM","otherSources-Annual","otherUses-Annual","pegRatio-Annual","peRatio-Annual","peRatioFiscal-Annual","peRatioSecurity-Annual","percentOfSharesOutstandingHeldByInsiders-Annual","percentPriceChange10Days-Annual","percentPriceChange13Weeks-Annual","percentPriceChange1Week-Annual","sellingGeneralAdministrativeExpensesAndOther-Annual","sharesHeldByInstitutions-Annual","sharesNumberOfCloselyHeld-Annual","sharesOutstanding-Annual","sharesOutstandingCurrent-Annual","shareTypeSecurity-Annual","shortTermDebt-Annual","shortTermReceivables-Annual","sicCode-Annual","state-Annual","shortBio-zh-cn","longBio-zh-cn","lowPriceLast3Months-Annual","lowPriceLast4Weeks-Annual","lowPriceLast52Weeks-Annual","lowPriceLast6Months-Annual","lowPriceLast9Months-Annual","lowPriceMTD-Annual","lowPriceYTD-Annual","marketCapitalization-Annual","localName-sv-se","shortBio-sv-se","longBio-sv-se","localName-ru-ru","localName-ms","longBio-ru-ru","localName-zh-tw","localName-da","longBio-zh-tw","shortBio-zh-tw","shortBio-ro-ro","localName-zh-cn","marketCapitalizationFiscal-Annual","marketCapitalizationFullyDiluted-Annual","marketCapitalizationSecurity-Annual","minorityInterestExpense-Annual","otherIntangibleAssets-Annual","otherLiabilities-Annual","otherLiabilitiesExcludingDeferredRevenue-Annual","otherOperatingExpense-Annual","netInvestingCashFlow-Annual","netOperatingCashFlow-Annual","netPropertyPlantEquipment-Annual","nonEquityReserves-Annual","nonOperatingExpense-Annual","nonOperatingIncomeExpense-Annual","numberOfEmployees-Annual","operatingIncome-Annual","priceToSales-Annual","priceToSales-TTM","averageDailyVolumeLast12Months-Annual","averageDailyVolumeLast13Weeks-Annual","averageDailyVolumeLast20Days-Annual","averageDailyVolumeLast26Weeks-Annual","averageDailyVolumeLast2Weeks-Annual","annualSalesTimestamp","boardOfDirectorMeetingDate","conferenceCallBroadcastURL","annualSalesLow","annualSalesMedian","annualSalesStandardDeviation","annualEPSMedian","annualEPSStandardDeviation","annualEPSTimestamp","annualEPSUpRevisions","annualEPSValue","annualSalesDownRevisions","annualSalesEstimates","annualSalesHigh","conferenceCallDate","priceToFreeCashFlow-Annual","priceToSalesFiscal-Annual","priceToTangibleBookFiscal-Annual","priceToTangibleBookValue-Annual","propertyPlantEquipmentBuildings-Annual","provisionForRisksCharges-Annual","purchaseOrSaleOfInvestments-Annual","saleOfFixedAssetsBusinesses-Annual","salesOrRevenue-Annual","earningsQuarter","lastEarningEstimateAverage","lastEarningUpdateDate","nextEarningDate","nextEarningDateType","nextEarningEstimateAverage","nextEarningsDateQuarter","nextEarningTime","q1EarningDate","q2EarningDate","q3EarningDate","q4EarningDate","annualEPSDownRevisions","annualEPSEstimates","annualEPSHigh","annualEPSLow","averageDailyVolumeLast3Months-Annual","averageDailyVolumeLast4Weeks-Annual","5YearAverageNetProfitMargin-Annual","5YearAveragePERatio-Annual","5YearAveragePreTaxProfitMargin-Annual","5YearAverageRAndDAsPercentOfSales-Annual","5YearAverageReturnEquity-Annual","5YearAverageReturnOnAssets-Annual","5YearAverageReturnOnInvestedCapital-Annual","5YearAverageSGAndAAsPercentOfSales-Annual","5YearAverageTotalDebtEquityRatio-Annual","5YearHighPERatio-Annual","address1-Annual","address2-Annual","amortizationOfIntangibleAssets-Annual","assetTurnover-Annual","auditorsOpinion-Annual","averageDailyPercentPriceChange4Weeks-Annual","averageDailyPercentVolumeChange4Weeks-Annual","averageDailyVolumeLast10Days-Annual","fundsFromOperations-TTM","generalIndustryClassification-TTM","grossIncome-TTM","grossIncomeMargin-TTM","highPriceLast13Weeks-TTM","ebitPerShare-TTM","epS-TTM","epsBasicBeforeExtraordinaries-TTM","epsDilutedBeforeUnusualExpense-TTM","epsFromContinuingOperations-TTM","epsFullyDiluted-TTM","epsSecurity-TTM","equityInEarningsOfAffiliatesIncome-TTM","sector-Annual","sectorName-Annual","securityIsPrimaryIssue-Annual","sellingGeneralAdministrativeExpenses-Annual","preTaxInterestCoverageRatio-Annual","preTaxProfitMargin-Annual","priceToBook-Annual","priceToBookFiscal-Annual","priceToCashFlow-Annual","leverageRatio-TTM","tangibleBookValuePerShare-Annual","tangibleOtherAssets-Annual","totalAssets-Annual","totalCash-Annual","totalCommonEquity-Annual","totalCurrentAssets-Annual","totalCurrentLiabilities-Annual","totalDebt-Annual","totalDebtToEquityRatio-Annual","totalEnterpriseValue-Annual","3YearAnnualRAndDGrowthRate-TTM","3YearAnnualRevenueGrowthRate-TTM","50DayMovingAverage-TTM","5DayMovingAverage-TTM","5YearAnnualCapitalSpendingGrowthRate-TTM","5YearAnnualDividendGrowthRate-TTM","5YearAnnualIncomeGrowthRate-TTM","5YearAnnualRAndDGrowthRate-TTM","5YearAnnualRevenueGrowthRate-TTM","5YearAverageDebtEquityRatio-TTM","5YearAverageGrossProfitMargin-TTM","annualSalesUpRevisions","annualSalesValue","quarterlyEPSDownRevisions","quarterlyEPSEstimates","quarterlyEPSHigh","quarterlyEPSLow","fiscalPeriodEndDate","quarterlyEPSMedian","quarterlyEPSStandardDeviation","quarterlyEPSTimestamp","quarterlyEPSUpRevisions","quarterlyEPSValue","quarterlySalesDownRevisions","quarterlySalesEstimates","quarterlySalesHigh","quarterlySalesLow","quarterlySalesMedian","quarterlySalesStandardDeviation","quarterlySalesTimestamp","quarterlySalesUpRevisions","quarterlySalesValue","marketCapitalizationExcludingNonTradedAndTreasuryIssuerLevel-Annual","marketCapitalizationExcludingNonTradedIssuerLevel-Annual","marketCapitalizationExcludingTreasuryIssuerLevel-Annual","quickRatio-Annual","rAndDAsPercentOfSales-Annual","receivablesPerDaySales-Annual","receivablesTurnover-Annual","researchAndDevelopment-Annual","reservesChange-Annual","retainedEarnings-Annual","returnOnAssets-Annual","returnOnAverageTotalEquity-Annual","returnOnCommonEquity-Annual","revenuePerShare-Annual","revenueToAssets-Annual","otherFinancingActivitiesSources-TTM","otherFinancingActivity-TTM","otherFunds-TTM","otherIntangibleAssets-TTM","otherLiabilities-TTM","otherLiabilitiesExcludingDeferredRevenue-TTM","otherOperatingExpense-TTM","otherSources-TTM","otherUses-TTM","pegRatio-TTM","sectorName-TTM","securityIsPrimaryIssue-TTM","sellingGeneralAdministrativeExpenses-TTM","sellingGeneralAdministrativeExpensesAndOther-TTM","sharesHeldByInstitutions-TTM","sharesNumberOfCloselyHeld-TTM","sharesOutstanding-TTM","sharesOutstandingCurrent-TTM","shareTypeSecurity-TTM","shortTermDebt-TTM","revenueToAssets-TTM","saleOfFixedAssetsBusinesses-TTM","salesOrRevenue-TTM","sector-TTM","priceToBookFiscal-TTM","priceToCashFlow-TTM","priceToFreeCashFlow-TTM","priceToSalesFiscal-TTM","priceToTangibleBookFiscal-TTM","popularityUniques","holdingPct","buyHoldingPct","sellHoldingPct","buyPctChange24Hours","absBuyPctChange24Hours","institutionalHoldingPct","dividendRatePercentage","marketCapInUSD","marketCapClassifications","daysSinceFirstTrade","daysTillNextEarningReport","enterpriseValuetoSales","enterpriseValuetoEBITDA","netProfitMargin","enterpriseValuetoOperCashflow","returnOnInvestedCapital","volumeRateOfChange10Days","volumeRateOfChange4Weeks","volumeRateOfChange3Months","volumeRateOfChange6Months","epsGrowth3Months","epsGrowth1Year","epsGrowth5Years","normalizedESGScore","daystilldividendXdate","liveTipranksTargetUpside","liveTipranksTargetUpsideAbsolute","absBuyPctChange24Hours-Industry-RankDesc","buyPctChange24Hours-Industry-RankDesc","holdingPct-Industry-RankDesc","tipRanksFourStarsTotalAnalysts-Industry-RankDesc","dividendYieldDaily-TTM-Industry-RankAsc","dividendYieldDaily-TTM-Industry-RankDesc","arabesqueESGTotal-Industry-Avg","arabesqueESGTotal-Industry-RankAsc","arabesqueESGTotal-Industry-RankDesc","arabesqueESGTotal-Industry-TotalItems","traders14DayChange-Industry-RankAsc","traders14DayChange-Industry-RankDesc","traders14DayChange-Industry-TotalItems","traders30DayChange-Industry-RankAsc","traders30DayChange-Industry-RankDesc","traders30DayChange-Industry-TotalItems","popularityUniques-Industry-RankAsc","popularityUniques-Industry-RankDesc","traders7DayChange-Industry-RankAsc","traders7DayChange-Industry-RankDesc","traders7DayChange-Industry-TotalItems","peRatio-TTM-Industry-Avg","peRatio-TTM-Industry-RankAsc","peRatio-TTM-Industry-RankDesc","peRatio-TTM-Industry-TotalItems","absBuyPctChange24Hours-Sector-RankDesc","buyPctChange24Hours-Sector-RankDesc","holdingPct-Sector-RankDesc","tipRanksFourStarsTotalAnalysts-Sector-RankDesc","dividendYieldDaily-TTM-Sector-RankAsc","dividendYieldDaily-TTM-Sector-RankDesc","arabesqueESGTotal-Sector-Avg","arabesqueESGTotal-Sector-RankAsc","arabesqueESGTotal-Sector-RankDesc","arabesqueESGTotal-Sector-TotalItems","traders14DayChange-Sector-RankAsc","traders14DayChange-Sector-RankDesc","traders14DayChange-Sector-TotalItems","traders30DayChange-Sector-RankAsc","traders30DayChange-Sector-RankDesc","traders30DayChange-Sector-TotalItems","popularityUniques-Sector-RankAsc","popularityUniques-Sector-RankDesc","traders7DayChange-Sector-RankAsc","traders7DayChange-Sector-RankDesc","traders7DayChange-Sector-TotalItems","peRatio-TTM-Sector-Avg","peRatio-TTM-Sector-RankAsc","peRatio-TTM-Sector-RankDesc","peRatio-TTM-Sector-TotalItems","absBuyPctChange24Hours-System-RankDesc","buyPctChange24Hours-System-RankDesc","holdingPct-System-RankDesc","traders14DayChange-System-RankAsc","traders14DayChange-System-RankDesc","traders14DayChange-System-TotalItems","traders30DayChange-System-RankAsc","traders30DayChange-System-RankDesc","traders30DayChange-System-TotalItems","popularityUniques-System-RankAsc","popularityUniques-System-RankDesc","traders7DayChange-System-RankAsc","traders7DayChange-System-RankDesc","traders7DayChange-System-TotalItems","tipRanksFourStarsTotalAnalysts-System-RankDesc","dividendYieldDaily-TTM-System-RankAsc","dividendYieldDaily-TTM-System-RankDesc","arabesqueESGTotal-System-Avg","arabesqueESGTotal-System-RankAsc","arabesqueESGTotal-System-RankDesc","arabesqueESGTotal-System-TotalItems","peRatio-TTM-System-Avg","peRatio-TTM-System-RankAsc","peRatio-TTM-System-RankDesc","peRatio-TTM-System-TotalItems"]
+            example: ?fields=instrumentid,DailyPriceChange,internalIndustryId
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstrumentInfo"
+  /sapi/instrumentsinfo/instruments/filtered/DailyMovers:
+    get:
+      operationId: getDailyMovers
+      summary: Get highest positive changed instruments in a day
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/getDailyMoversResponse"
+  /api/account/v1/user/geolocation/countries:
+    get:
+      operationId: getCountries
+      summary: Get countries models that include etoro country id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Country"
+ 
+components:
+  schemas:
+    getInstrumentResponse:
+      type: object
+      properties:
+        InstrumentDisplayData:
+          type: object
+          properties:
+            InstrumentID:
+              type: integer
+            InstrumentDisplayName:
+              type: string
+            InstrumentTypeID:
+              type: integer
+            ExchangeID:
+              type: integer
+            Images:
+              type: array
+              items:
+                type: object
+                properties:
+                  InstrumentID:
+                    type: integer
+                  Width:
+                    type: number
+                  Height:
+                    type: number
+                  Uri:
+                    type: string
+                  BackgroundColor:
+                    type: string
+                  TextColor:
+                    type: string
+            SymbolFull:
+              type: string
+            StocksIndustryID:
+              type: integer
+            PriceSource:
+              type: string
+            HasExpirationDate:
+              type: boolean
+            IsInternalInstrument:
+              type: boolean
+          description: The instrument display data.
+    getRateResponse:
+      type: object
+      properties:
+        Rate:
+          type: object
+          properties:
+            InstrumentID:
+              type: integer
+            Ask:
+              type: number
+            Bid:
+              type: number
+            LastExecution:
+              type: number
+            ConversionRateAsk:
+              type: number
+            ConversionRateBid:
+              type: number
+            Date:
+              type: string
+              format: date-time
+            UnitMargin:
+              type: number
+            UnitMarginAsk:
+              type: number
+            UnitMarginBid:
+              type: number
+            PriceRateID:
+              type: integer
+            BidDiscounted:
+              type: number
+            AskDiscounted:
+              type: number
+            UnitMarginBidDiscounted:
+              type: number
+            UnitMarginAskDiscounted:
+              type: number
+          description: The rate information.
+    rankingsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          CID:
+            type: integer
+            description: The customer ID
+          Value:
+            type: object
+            properties:
+              CustomerId:
+                type: integer
+                description: The customer ID
+              UserName:
+                type: string
+                description: The username of the investor
+              HasAvatar:
+                type: boolean
+                description: Whether the investor has an avatar
+              IsSocialConnected:
+                type: boolean
+                description: Whether the investor is socially connected
+              IsTestAccount:
+                type: boolean
+                description: Whether the account is a test account
+              DisplayFullName:
+                type: boolean
+                description: Whether the full name is displayed
+              BonusOnly:
+                type: boolean
+                description: Whether it is bonus only
+              Blocked:
+                type: boolean
+                description: Whether the investor is blocked
+              Verified:
+                type: boolean
+                description: Whether the investor is verified
+              PopularInvestor:
+                type: boolean
+                description: Whether the investor is a popular investor
+              CopyBlock:
+                type: boolean
+                description: Whether the investor has copyblock enabled
+              IsFund:
+                type: boolean
+                description: Whether it is a fund
+              IsBronze:
+                type: boolean
+                description: Whether it is bronze
+              FundType:
+                type: integer
+                description: The type of fund
+              Tags:
+                type: array
+                items:
+                  type: integer
+                description: The tags
+              Gain:
+                type: number
+                format: float
+                description: The gain
+              DailyGain:
+                type: number
+                format: float
+                description: The daily gain
+              ThisWeekGain:
+                type: number
+                format: float
+                description: The gain of this week
+              RiskScore:
+                type: integer
+                description: The risk score
+              MaxDailyRiskScore:
+                type: integer
+                description: The maximum daily risk score
+              MaxMonthlyRiskScore:
+                type: integer
+                description: The maximum monthly risk score
+              Copiers:
+                type: integer
+                description: The number of copiers
+              CopiedTrades:
+                type: integer
+                description: The number of copied trades
+              CopyTradesPct:
+                type: number
+                format: float
+                description: The percentage of copy trades
+              CopyInvestmentPct:
+                type: number
+                format: float
+                description: The percentage of copy investment
+              BaseLineCopiers:
+                type: integer
+                description: The baseline copiers
+              CopiersGain:
+                type: number
+                format: float
+                description: The gain of copiers
+              AUMTier:
+                type: integer
+                description: The AUM tier
+              AUMTierV2:
+                type: integer
+                description: The AUM tier v2
+              AUMTierDesc:
+                type: string
+                description: The AUM tier description
+              VirtualCopiers:
+                type: integer
+                description: The number of virtual copiers
+              Trades:
+                type: integer
+                description: The number of trades
+              WinRatio:
+                type: number
+                format: float
+                description: The win ratio
+              DailyDD:
+                type: number
+                format: float
+                description: The daily drawdown
+              WeeklyDD:
+                type: number
+                format: float
+                description: The weekly drawdown
+              ProfitableWeeksPct:
+                type: number
+                format: float
+                description: The percentage of profitable weeks
+              ProfitableMonthsPct:
+                type: number
+                format: float
+                description: The percentage of profitable months
+              Velocity:
+                type: number
+                format: float
+                description: The velocity
+              Exposure:
+                type: number
+                format: float
+                description: The exposure
+              AvgPosSize:
+                type: number
+                format: float
+                description: The average position size
+              OptimalCopyPosSize:
+                type: number
+                format: float
+                description: The optimal copy position size
+              HighLeveragePct:
+                type: number
+                format: float
+                description: The high leverage percentage
+              MediumLeveragePct:
+                type: number
+                format: float
+                description: The medium leverage percentage
+              LowLeveragePct:
+                type: number
+                format: float
+                description: The low leverage percentage
+              PeakToValley:
+                type: number
+                format: float
+                description: The peak to valley
+              PeakToValleyStart:
+                type: string
+                format: date-time
+                description: The start of the peak to valley
+              PeakToValleyEnd:
+                type: string
+                format: date-time
+                description: The end of the peak to valley
+              LongPosPct:
+                type: number
+                format: float
+                description: The long position percentage
+              TopTradedInstrumentId:
+                type: integer
+                description: The top traded instrument ID
+              TopTradedAssetClassId:
+                type: integer
+                description: The top traded asset class ID
+              TopTradedInstrumentPct:
+                type: number
+                format: float
+                description: The top traded instrument percentage
+              TotalTradedInstruments:
+                type: integer
+                description: The total number of traded instruments
+              ActiveWeeks:
+                type: integer
+                description: The number of active weeks
+              FirstActivity:
+                type: string
+                format: date-time
+                description: The first activity
+              LastActivity:
+                type: string
+                format: date-time
+                description: The last activity
+              ActiveWeeksPct:
+                type: number
+                format: float
+                description: The percentage of active weeks
+              WeeksSinceRegistration:
+                type: integer
+                description: The weeks since registration
+              Country:
+                type: string
+                description: The country
+              AffiliateId:
+                type: integer
+                description: The affiliate ID
+              InstrumentPct:
+                type: number
+                format: float
+                description: The instrument percentage
+    getSearchResponse:
+      type: object
+      properties:
+        users:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchUser"
+            totalResults:
+              type: integer
+        instruments:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/SearchInstrument"
+            totalResults:
+              type: integer
+        searchLinks:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: string
+            totalResults:
+              type: integer
+    SearchUser:
+      type: object
+      properties:
+        accountType:
+          type: integer
+        username:
+          type: string
+        cid:
+          type: integer
+        gcid:
+          type: integer
+        firstName:
+          type: string
+        lastName:
+          type: string
+        allowShareFullName:
+          type: boolean
+        avatars:
+          type: object
+          properties:
+            Medium:
+              type: string
+            Large:
+              type: string
+            Small:
+              type: string
+        followersCount:
+          type: integer
+        copiersCount:
+          type: integer
+        url:
+          type: string
+        score:
+          type: integer
+        updatedAt:
+          type: integer
+        reason:
+          type: string
+        piLevel:
+          type: integer
+        isPi:
+          type: boolean
+    SearchInstrument:
+      type: object
+      properties:
+        instrumentID:
+          type: integer
+          description: the instrument id in eToro
+        displayName:
+          type: string
+        name:
+          type: string
+        marketName:
+          type: string
+        categoryName:
+          type: string
+        typeName:
+          type: string
+        images:
+          type: object
+          properties:
+            35X35:
+              type: string
+            90X90:
+              type: string
+            0X0:
+              type: string
+            150X150:
+              type: string
+            80X80:
+              type: string
+            50X50:
+              type: string
+        fullSymbolName:
+          type: string
+        score:
+          type: integer
+        investors:
+          type: integer
+        updatedAt:
+          type: integer
+        reason:
+          type: string
+    candlesResponse:
+      type: object
+      properties:
+        Candles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Candle"
+        Interval:
+          type: string
+    Candle:
+      type: object
+      properties:
+        Close:
+          type: number
+        FromDate:
+          format: date-time
+        High:
+          type: number
+        InstrumentID:
+          type: number
+        Low:
+          type: number
+        Open:
+          type: number
+    getPathsResponse:
+      type: object
+      properties:
+        description:
+          type: string
+        paths:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: string
+    getDailyMoversResponse:
+      type: object
+      properties:
+        page:
+          type: number
+        pageSize:
+          type: number
+        totalItems:
+          type: number
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              absDailyPriceChange:
+                type: number
+              instrumentId:
+                type: number
+    UserPublicPortfolio:
+      type: object
+      properties:
+          page:
+            type: number  
+          pageSize:
+            type: number 
+          totalItems:
+            type: number 
+          items:
+            type: array
+            items:
+                type: object
+                description: each item can be one of 3 cash balance, invested instrument or copied user 
+                properties:
+                  isCash:
+                    type: boolean
+                    description: if true this its the availble cash percentage
+                  percentage:
+                    type: number 
+                    description: percentage of the portolio item
+                  cid:
+                    type: number
+                    description: if exists this is the copied user realCid
+                  instrumentId:
+                    type: number
+                    description: if exists this is the instrument id that the user investing
+                  instrumentSymbol:
+                    type: string
+                    description: the ticker of the instrument
+    InstrumentInfo:
+      type: object
+      properties:
+        dailyPriceChange:
+          type: number
+        absDailyPriceChange:
+          type: number
+        weeklyPriceChange:
+          type: number
+        monthlyPriceChange:
+          type: number
+        isDelisted:
+          type: boolean
+        isCurrentlyTradable:
+          type: boolean
+        isExchangeOpen:
+          type: boolean
+        internalClosingPrice:
+          type: number
+        isActiveInPlatform:
+          type: boolean
+        isBuyEnabled:
+          type: boolean
+        currentRate:
+          type: number
+        threeMonthPriceChange:
+          type: number
+        sixMonthPriceChange:
+          type: number
+        oneYearPriceChange:
+          type: number
+        currMonthPriceChange:
+          type: number
+        currQuarterPriceChange:
+          type: number
+        currYearPriceChange:
+          type: number
+        lastYearPriceChange:
+          type: number
+        lastTwoYearsPriceChange:
+          type: number
+        oneMonthAgoPriceChange:
+          type: number
+        twoMonthsAgoPriceChange:
+          type: number
+        threeMonthsAgoPriceChange:
+          type: number
+        sixMonthsAgoPriceChange:
+          type: number
+        oneYearAgoPriceChange:
+          type: number
+        cvtBid:
+          type: number
+        cvtAsk:
+          type: number
+        cvtBiNoSpread:
+          type: number
+        cvtAskNoSpread:
+          type: number
+        traders7DayChange:
+          type: number
+        traders14DayChange:
+          type: number
+        traders30DayChange:
+          type: number
+        popularityUniques7Day:
+          type: number
+        popularityUniques14Day:
+          type: number
+        popularityUniques30Day:
+          type: number
+        annualSalesValue:
+          type: number
+        highPriceLast26Weeks-TTM:
+          type: number
+        highPriceMTD-Annual:
+          type: number
+        otherFinancingActivitiesUses-TTM:
+          type: number
+        percentPriceChange1Week-Annual:
+          type: number
+        accumulatedMinorityInterest-Annual:
+          type: number
+        latestCloseAsPercentOf10WeekAverage-TTM:
+          type: number
+        capitalExpendituresFixedAssets-Annual:
+          type: number
+        figiSecurityType:
+          type: string
+        numberOfEmployees-TTM-ThreeMonthsAgo:
+          type: number
+        peRatio-TTM-SixMonthsAgo:
+          type: number
+        otherFunds-Annual:
+          type: number
+        totalEnterpriseValue-Annual:
+          type: number
+        shortBio-en-us:
+          type: string
+        floatCurrent-Annual:
+          type: number
+        longBusinessDescription-TTM:
+          type: string
+        fiscalPeriod:
+          type: string
+        highPriceLast3Months-TTM:
+          type: number
+        highPriceYTD-Annual:
+          type: number
+        otherProceedsfromStockOptions-TTM:
+          type: number
+        marketCapitalizationIssuerLevel-Annual:
+          type: number
+        accumulatedOtherCompensationIncomeOtherAdjustments-Annual:
+          type: number
+        longBio-zh-tw:
+          type: string
+        cashDividendsPaid-Annual:
+          type: number
+        fiscalPeriod-Annual:
+          type: string
+        netIncomeCashFlow-TTM:
+          type: number
+        peRatio-TTM-OneYearAgo:
+          type: number
+        extraordinaryGainsOrLossesFromSaleOfAsset-TTM:
+          type: number
+        costOfGoodsSold-Annual:
+          type: number
+        5YearAverageReturnEquity-TTM:
+          type: number
+        shortBio-de-de:
+          type: string
+        longBio-zh-cn:
+          type: string
+        fiscalPeriodEndDate:
+          type: string
+        highPriceLast4Weeks-TTM:
+          type: number
+        incomeTaxes-Annual:
+          type: number
+        preferredDividendsCashFlow-TTM:
+          type: number
+        marketCapitalizationExcludingNonTradedAndTreasuryIssuerLevel-TTM:
+          type: number
+        arabesqueIsDefence:
+          type: boolean
+        latestCloseAsPercentOf200DayAverage-TTM:
+          type: number
+        cashEquivalentsGeneric-Annual:
+          type: number
+        fiscalPeriod-TTM:
+          type: string
+        netIncomeAvailableToCommonBasic-TTM:
+          type: number
+        netIncomeContinuingOperations-TTM:
+          type: number
+        extraordinaryItem-TTM:
+          type: number
+        cumulativeTranslationAdjustment-Annual:
+          type: number
+        5YearAverageReturnOnAssets-TTM:
+          type: number
+        freeCashFlow-Annual:
+          type: number
+        shortBio-sv-se:
+          type: string
+        quarterlyEPSDownRevisions:
+          type: number
+        highPriceLast52Weeks-TTM:
+          type: number
+        industry-Annual:
+          type: string
+        proceedsFromStockOptions-TTM:
+          type: number
+        marketCapitalizationExcludingNonTradedIssuerLevel-TTM:
+          type: number
+        arabesqueIsFirearms:
+          type: boolean
+        shortBio-zh-tw:
+          type: string
+        otherIntangibleAssets-Annual:
+          type: number
+        figiCode:
+          type: string
+        netAssetsFromAcquisitions-TTM:
+          type: number
+        netIncomeTotalOperations-TTM:
+          type: number
+        extraordinaryItemsIncludingAccountingChange-TTM:
+          type: number
+        currency-Annual:
+          type: string
+        5YearAverageReturnOnInvestedCapital-TTM:
+          type: number
+        localName-nb-no:
+          type: string
+        longTermDebt-TTM:
+          type: number
+        quarterlyEPSEstimates:
+          type: number
+        highPriceLast6Months-TTM:
+          type: number
+        industryName-Annual:
+          type: string
+        purchaseOfInvestments-TTM:
+          type: number
+        marketCapitalizationExcludingTreasuryIssuerLevel-TTM:
+          type: number
+        arabesqueIsFossilFuels:
+          type: boolean
+        latestCloseAsPercentOf30WeekAverage-TTM:
+          type: number
+        otherLiabilities-Annual:
+          type: number
+        investmentInUnconsolidatedAffiliates-Annual:
+          type: number
+        netChangeInCash-TTM:
+          type: number
+        netInvestingCashFlow-TTM:
+          type: number
+        factSetCompanyEntityID-TTM:
+          type: string
+        currentRatio-Annual:
+          type: number
+        5YearAverageSGAndAAsPercentOfSales-TTM:
+          type: number
+        freeCashFlowPerShareDiluted-Annual:
+          type: number
+        longTermDebtToEquityRatio-TTM:
+          type: number
+        quarterlyEPSHigh:
+          type: number
+        highPriceLast9Months-TTM:
+          type: number
+        instrumentClass-Annual:
+          type: string
+        reductionOfLongTermDebt-TTM:
+          type: number
+        marketCapitalizationIssuerLevel-TTM:
+          type: number
+        arabesqueIsGambling:
+          type: boolean
+        localName-zh-cn:
+          type: string
+        otherLiabilitiesExcludingDeferredRevenue-Annual:
+          type: number
+        figiMarketSector:
+          type: string
+        netFinancingCashFlow-TTM:
+          type: number
+        netOperatingCashFlow-TTM:
+          type: number
+        faxNumber-TTM:
+          type: string
+        currentRevenuePerEmployee-Annual:
+          type: number
+        5YearAverageTotalDebtEquityRatio-TTM:
+          type: number
+        longBio-nb-no:
+          type: string
+        priceToBookFiscal-TTM:
+          type: number
+        quarterlyEPSLow:
+          type: number
+        highPriceMTD-TTM:
+          type: number
+        accumulatedOtherCompensationIncomeOtherAdjustments-TTM:
+          type: number
+        repurchaseOfCommonPreferredStock-TTM:
+          type: number
+        accountingStandardsFollowed-Annual:
+          type: string
+        arabesqueIsGMO:
+          type: boolean
+        latestCloseAsPercentOf52WeekHigh-TTM:
+          type: number
+        otherOperatingExpense-Annual:
+          type: number
+        inventories-Annual:
+          type: number
+        netGoodwill-TTM:
+          type: number
+        netPropertyPlantEquipment-TTM:
+          type: number
+        fiscalPeriodEndDate-TTM:
+          type: string
+        dailyVolumeAsPercentOf10DayAverageVolume-Annual:
+          type: number
+        ebitPerShare-Annual:
+          type: number
+        fundsFromOperations-Annual:
+          type: number
+        beta36Month-TTM:
+          type: number
+        quarterlyEPSMedian:
+          type: number
+        highPriceYTD-TTM:
+          type: number
+        averageDailyPercentPriceChange4Weeks-Annual:
+          type: number
+        saleOfCommonPreferredStock-TTM:
+          type: number
+        10DayMovingAverage-Annual:
+          type: number
+        arabesqueIsNuclear:
+          type: boolean
+        investingActivitiesOtherUses-TTM:
+          type: number
+        priceToSales-Annual:
+          type: number
+        inventoriesCashFlow-Annual:
+          type: number
+        netIncomeAfterExtraordinaryItems-TTM:
+          type: number
+        nonEquityReserves-TTM:
+          type: number
+        operatingIncomeAfterUnusualItems-Annual:
+          type: number
+        dateOf52WeekHigh-Annual:
+          type: string
+        epS-Annual:
+          type: number
+        shortBio-nb-no:
+          type: string
+        conferenceCallTime:
+          type: string
+        quarterlyEPSStandardDeviation:
+          type: number
+        incomeTaxes-TTM:
+          type: number
+        averageDailyPercentVolumeChange4Weeks-Annual:
+          type: number
+        saleOrMaturityOfInvestments-TTM:
+          type: number
+        10WeekMovingAverage-Annual:
+          type: number
+        arabesqueIsPork:
+          type: boolean
+        latestCloseAsPercentOf52WeekLow-TTM:
+          type: number
+        cashFlowPerShare-Annual:
+          type: number
+        inventoriesFinishedGoods-Annual:
+          type: number
+        arabesqueESGTotal:
+          type: number
+        nonOperatingExpense-TTM:
+          type: number
+        operatingLeaseExpense-Annual:
+          type: number
+        dateOf52WeekLow-Annual:
+          type: string
+        epsBasicBeforeExtraordinaries-Annual:
+          type: number
+        ebitPerShare-TTM:
+          type: number
+        dividendAnnouncementDate:
+          type: string
+        quarterlyEPSTimestamp:
+          type: string
+        5YearAverageNetProfitMargin-Annual:
+          type: number
+        averageDailyVolumeLast10Days-Annual:
+          type: number
+        stockBasedCompensationCashFlow-TTM:
+          type: number
+        1YearAnnualRevenueGrowthRate-Annual:
+          type: number
+        arabesqueIsRecreationalDrugs:
+          type: boolean
+        issuanceOfLongTermDebt-TTM:
+          type: number
+        cashPerShare-Annual:
+          type: number
+        inventoriesProgressPayments-Annual:
+          type: number
+        arabesqueGlobalCompactAnti-Corruption:
+          type: number
+        stockBasedCompensationCashFlow-Annual:
+          type: number
+        operatingMargin-Annual:
+          type: number
+        daysSalesOutstanding-Annual:
+          type: number
+        epsDilutedBeforeUnusualExpense-Annual:
+          type: number
+        shortBio-en-gb:
+          type: string
+        dividendFrequency:
+          type: string
+        quarterlyEPSUpRevisions:
+          type: number
+        5YearAveragePERatio-Annual:
+          type: number
+        lowPriceMTD-TTM:
+          type: number
+        peRatioFiscal-TTM:
+          type: number
+        200DayMovingAverage-Annual:
+          type: number
+        arabesqueIsStemCells:
+          type: boolean
+        latestCloseAsPercentOf5DayAverage-TTM:
+          type: number
+        cashShortTermInvestments-Annual:
+          type: number
+        inventoriesRawMaterials-Annual:
+          type: number
+        arabesqueGlobalCompactEnvironment:
+          type: number
+        otherFinancingActivitiesSources-TTM:
+          type: number
+        otherAfterTaxAdjustments-Annual:
+          type: number
+        daysSalesOutstandingTimeWeighted-Annual:
+          type: number
+        longBio-en-us:
+          type: string
+        epS-TTM:
+          type: number
+        dividendStatus:
+          type: string
+        quarterlyEPSValue:
+          type: number
+        5YearAveragePreTaxProfitMargin-Annual:
+          type: number
+        lowPriceYTD-TTM:
+          type: number
+        peRatioSecurity-TTM:
+          type: number
+        30WeekMovingAverage-Annual:
+          type: number
+        arabesqueIsThermalCoal:
+          type: boolean
+        capitalExpenditures-TTM:
+          type: number
+        ceO-Annual:
+          type: string
+        inventoriesWorkInProgress-Annual:
+          type: number
+        arabesqueGlobalCompactTotal:
+          type: number
+        otherFinancingActivity-TTM:
+          type: number
+        otherAssets-Annual:
+          type: number
+        totalVolumeLast6Months-TTM:
+          type: number
+        localName-en-us:
+          type: string
+        longBio-en-gb:
+          type: string
+        dividendPayDate:
+          type: string
+        quarterlySalesDownRevisions:
+          type: number
+        5YearAverageRAndDAsPercentOfSales-Annual:
+          type: number
+        marketCapitalization-TTM:
+          type: number
+        percentOfSharesOutstandingHeldByInsiders-TTM:
+          type: number
+        3YearAnnualCapitalSpendingGrowthRate-Annual:
+          type: number
+        arabesqueIsTobacco:
+          type: boolean
+        latestCloseAsPercentOf5YearHigh-TTM:
+          type: number
+        changeInCapitalStock-Annual:
+          type: number
+        dividendPayoutRatio-Annual:
+          type: number
+        arabesqueHumanRights:
+          type: number
+        otherFunds-TTM:
+          type: number
+        otherCurrentAssets-Annual:
+          type: number
+        totalVolumeLast9Months-TTM:
+          type: number
+        accumulatedDepreciation-TTM:
+          type: number
+        epsBasicBeforeExtraordinaries-TTM:
+          type: number
+        dividendRecordDate:
+          type: string
+        quarterlySalesEstimates:
+          type: number
+        5YearAverageReturnEquity-Annual:
+          type: number
+        highPriceLast26Weeks-Annual:
+          type: number
+        percentPriceChange10Days-TTM:
+          type: number
+        3YearAnnualDividendGrowthRate-Annual:
+          type: number
+        workingCapital-Annual:
+          type: number
+        generalIndustryClassification-Annual:
+          type: string
+        changeInCurrentDebt-Annual:
+          type: number
+        dividendRate-Annual:
+          type: number
+        arabesqueLabourRights:
+          type: number
+        otherIntangibleAssets-TTM:
+          type: number
+        otherCurrentLiabilities-Annual:
+          type: number
+        totalVolumeMTD-TTM:
+          type: number
+        accumulatedMinorityInterest-TTM:
+          type: number
+        localName-en-gb:
+          type: string
+        lastXDividendDate:
+          type: string
+        tipranksTotalAnalysts:
+          type: number
+        5YearAverageReturnOnAssets-Annual:
+          type: number
+        highPriceLast3Months-Annual:
+          type: number
+        percentPriceChange13Weeks-TTM:
+          type: number
+        3YearAnnualIncomeGrowthRate-Annual:
+          type: number
+        workingCapitalPerShare-Annual:
+          type: number
+        latestCloseAsPercentOf5YearLow-TTM:
+          type: number
+        changesInWorkingCapital-Annual:
+          type: number
+        dividendsPerShareLTMSecurity-Annual:
+          type: number
+        arabesqueControversialWeaponsReason:
+          type: string
+        otherLiabilities-TTM:
+          type: number
+        otherFinancingActivitiesSources-Annual:
+          type: number
+        totalVolumeYTD-TTM:
+          type: number
+        sectorName-TTM:
+          type: string
+        epsDilutedBeforeUnusualExpense-TTM:
+          type: number
+        nextEDFiscalYear:
+          type: number
+        annualSalesUpRevisions:
+          type: number
+        5YearAverageReturnOnInvestedCapital-Annual:
+          type: number
+        highPriceLast4Weeks-Annual:
+          type: number
+        percentPriceChange1Week-TTM:
+          type: number
+        3YearAnnualRAndDGrowthRate-TTM:
+          type: number
+        zipCode-Annual:
+          type: string
+        changeInCurrentDebt-TTM:
+          type: number
+        city-Annual:
+          type: string
+        shortTermReceivables-TTM:
+          type: number
+        arabesqueIsAdultEntertainment:
+          type: boolean
+        otherLiabilitiesExcludingDeferredRevenue-TTM:
+          type: number
+        otherFinancingActivity-Annual:
+          type: number
+        unusualExpense-TTM:
+          type: number
+        securityIsPrimaryIssue-TTM:
+          type: boolean
+        shortBio-es-es:
+          type: string
+        originalCurrency:
+          type: string
+        tipranksTargetPrice:
+          type: number
+        5YearAverageSGAndAAsPercentOfSales-Annual:
+          type: number
+        highPriceLast52Weeks-Annual:
+          type: number
+        percentPriceChange26Weeks-TTM:
+          type: number
+        3YearAnnualRevenueGrowthRate-TTM:
+          type: number
+        10DayMovingAverage-TTM:
+          type: number
+        consolidatedNetIncome-TTM:
+          type: number
+        capitalExpenditures-Annual:
+          type: number
+        sicCode-TTM:
+          type: string
+        arabesqueIsAlcohol:
+          type: boolean
+        otherOperatingExpense-TTM:
+          type: number
+        fiscalPeriodLengthDays-TTM:
+          type: number
+        website-TTM:
+          type: string
+        sellingGeneralAdministrativeExpenses-TTM:
+          type: number
+        epsFromContinuingOperations-TTM:
+          type: string
+        originalCurrencyAmount:
+          type: number
+        tipranksTargetPriceCurrency:
+          type: string
+        tipRanksFourStarsAnalystStockSuccessRate:
+          type: number
+        highPriceLast6Months-Annual:
+          type: number
+        percentPriceChange2Weeks-TTM:
+          type: number
+        50DayMovingAverage-TTM:
+          type: number
+        10WeekMovingAverage-TTM:
+          type: number
+        grossIncome-Annual:
+          type: number
+        salesOrRevenue-Annual:
+          type: number
+        state-TTM:
+          type: string
+        arabesqueIsControversialWeapons:
+          type: boolean
+        otherSources-TTM:
+          type: number
+        fiscalPeriodStartDate-TTM:
+          type: string
+        cashDividendsOrCashFlow-Annual:
+          type: number
+        sellingGeneralAdministrativeExpensesAndOther-TTM:
+          type: number
+        longBio-es-es:
+          type: string
+        replayDate:
+          type: string
+        tipranksTargetPriceUpside:
+          type: number
+        tipRanksFourStarsAnalystSuccessRate:
+          type: number
+        highPriceLast9Months-Annual:
+          type: number
+        percentPriceChange3Months-TTM:
+          type: number
+        5DayMovingAverage-TTM:
+          type: number
+        1YearAnnualRevenueGrowthRate-TTM:
+          type: number
+        corporateLocation-TTM:
+          type: string
+        priceToSales-TTM:
+          type: number
+        stateOfIncorporation-TTM:
+          type: string
+        3YearAnnualRAndDGrowthRate-Annual:
+          type: number
+        otherFinancingActivitiesUses-Annual:
+          type: number
+        float-TTM:
+          type: number
+        capitalExpendituresPerShare-Annual:
+          type: number
+        sharesHeldByInstitutions-TTM:
+          type: number
+        averageDailyPercentVolumeChange4Weeks-TTM:
+          type: number
+        localName-sv-se:
+          type: string
+        tipranksAnalystsSupportingBuy:
+          type: number
+        tipRanksFourStarsAnalystTotalRecommendations:
+          type: number
+        industryName-TTM:
+          type: string
+        ipoDate:
+          type: string
+        5YearAnnualCapitalSpendingGrowthRate-TTM:
+          type: number
+        netGoodwill-Annual:
+          type: number
+        capitalExpendituresPerShare-TTM:
+          type: number
+        saleOfFixedAssetsBusinesses-Annual:
+          type: number
+        stockOptionCompensationExpense-TTM:
+          type: number
+        3YearAnnualRevenueGrowthRate-Annual:
+          type: number
+        otherProceedsfromStockOptions-Annual:
+          type: number
+        floatAsPercentOfSharesOutstanding-TTM:
+          type: number
+        cashFlowFromOperPerShareNet-Annual:
+          type: number
+        sharesNumberOfCloselyHeld-TTM:
+          type: number
+        localName-es-es:
+          type: string
+        shortBio-zh-cn:
+          type: string
+        tipranksAnalystsSupportingHold:
+          type: number
+        tipRanksFourStarsConsensus:
+          type: string
+        instrumentClass-TTM:
+          type: string
+        quickRatio-Annual:
+          type: number
+        5YearAnnualDividendGrowthRate-TTM:
+          type: number
+        netIncomeAfterExtraordinaryItems-Annual:
+          type: number
+        costOfGoodsSold-TTM:
+          type: number
+        boardOfDirectorMeetingDate:
+          type: string
+        tangibleBookValuePerShare-TTM:
+          type: number
+        50DayMovingAverage-Annual:
+          type: number
+        preferredDividendsCashFlow-Annual:
+          type: number
+        floatCurrent-TTM:
+          type: number
+        cashTaxesPaid-Annual:
+          type: number
+        longBio-ro:
+          type: string
+        averageDailyVolumeLast10Days-TTM:
+          type: number
+        longBio-sv-se:
+          type: string
+        tipranksAnalystsSupportingSell:
+          type: number
+        tipRanksFourStarsFirmName:
+          type: string
+        instrumentLevelSector-TTM:
+          type: string
+        rAndDAsPercentOfSales-Annual:
+          type: number
+        5YearAnnualIncomeGrowthRate-TTM:
+          type: number
+        netIncomeAvailableToCommonBasic-Annual:
+          type: number
+        cashDividendsOrCashFlow-TTM:
+          type: number
+        conferenceCallBroadcastURL:
+          type: string
+        dividendsPerShareSecurity-TTM:
+          type: number
+        5DayMovingAverage-Annual:
+          type: number
+        proceedsFromStockOptions-Annual:
+          type: number
+        freeCashFlow-TTM:
+          type: number
+        changeInLongTermDebt-Annual:
+          type: number
+        longBio-da:
+          type: string
+        shortBio-fr-fr:
+          type: string
+        priceToCashFlow-TTM:
+          type: number
+        tipranksConsensus:
+          type: string
+        tipRanksFourStarsHighPriceTarget:
+          type: number
+        intangibleAssets-TTM:
+          type: number
+        receivablesPerDaySales-Annual:
+          type: number
+        5YearAnnualRAndDGrowthRate-TTM:
+          type: number
+        netIncomeCashFlow-Annual:
+          type: number
+        cumulativeTranslationAdjustment-TTM:
+          type: number
+        conferenceCallDate:
+          type: string
+        dividendYieldDaily-TTM:
+          type: number
+        5YearAnnualCapitalSpendingGrowthRate-Annual:
+          type: number
+        purchaseOfInvestments-Annual:
+          type: number
+        freeCashFlowPerShareDiluted-TTM:
+          type: number
+        commonDividends-Annual:
+          type: number
+        longBio-ms:
+          type: string
+        averageDailyVolumeLast12Months-TTM:
+          type: number
+        priceToFreeCashFlow-TTM:
+          type: number
+        tipranksHighPriceTarget:
+          type: number
+        tipRanksFourStarsLowPriceTarget:
+          type: number
+        interestExpense-TTM:
+          type: number
+        receivablesTurnover-Annual:
+          type: number
+        5YearAnnualRevenueGrowthRate-TTM:
+          type: number
+        netIncomeContinuingOperations-Annual:
+          type: number
+        cashFlowFromOperPerShareNet-TTM:
+          type: number
+        investmentsLongTermReceivables-Annual:
+          type: number
+        dividendYieldFiscal-TTM:
+          type: number
+        5YearAnnualDividendGrowthRate-Annual:
+          type: number
+        reductionOfLongTermDebt-Annual:
+          type: number
+        deferredTaxesInvestmentTaxCredit-TTM:
+          type: number
+        interestPaidCashFlow-Annual:
+          type: number
+        localName-ro:
+          type: string
+        localName-cs:
+          type: string
+        priceToSalesFiscal-TTM:
+          type: number
+        tipranksLowPriceTarget:
+          type: number
+        tipRanksFourStarsRecommendation:
+          type: string
+        inventories-TTM:
+          type: number
+        researchAndDevelopment-Annual:
+          type: number
+        5YearAverageDebtEquityRatio-TTM:
+          type: number
+        netIncomeTotalOperations-Annual:
+          type: number
+        currency-TTM:
+          type: string
+        investorRelationsEmail-Annual:
+          type: string
+        dividendYieldSecurity-TTM:
+          type: number
+        5YearAnnualIncomeGrowthRate-Annual:
+          type: number
+        repurchaseOfCommonPreferredStock-Annual:
+          type: number
+        deferredTaxLiabilities-TTM:
+          type: number
+        investingActivitiesOtherUses-Annual:
+          type: number
+        extraordinaryGainsOrLossesFromSaleOfAsset-Annual:
+          type: number
+        averageDailyVolumeLast13Weeks-TTM:
+          type: number
+        priceToTangibleBookFiscal-TTM:
+          type: number
+        longTermDebt-Annual:
+          type: number
+        tipRanksFourStarsRecommendationArticleUrl:
+          type: string
+        inventoriesCashFlow-TTM:
+          type: number
+        reservesChange-Annual:
+          type: number
+        5YearAverageGrossProfitMargin-TTM:
+          type: number
+        totalDebt-TTM:
+          type: number
+        cashTaxesPaid-TTM:
+          type: number
+        isoCountryCode-Annual:
+          type: string
+        dollarVolume1Week-TTM:
+          type: number
+        5YearAnnualRAndDGrowthRate-Annual:
+          type: number
+        saleOfCommonPreferredStock-Annual:
+          type: number
+        shortBio-vi-vn:
+          type: string
+        issuanceOfLongTermDebt-Annual:
+          type: number
+        epsFromContinuingOperations-Annual:
+          type: string
+        shortBio-cs:
+          type: string
+        priceToTangibleBookValue-TTM:
+          type: number
+        otherCurrentLiabilities-TTM:
+          type: number
+        tipRanksFourStarsRecommendationDate:
+          type: string
+        longTermDebtToTotalCapital-TTM:
+          type: number
+        retainedEarnings-Annual:
+          type: number
+        rAndDAsPercentOfSales-TTM:
+          type: number
+        totalDebtToEquityRatio-TTM:
+          type: number
+        currentRatio-TTM:
+          type: number
+        commonSharesOutstandingSecurity-Annual:
+          type: number
+        domicileIndicatorCode-TTM:
+          type: string
+        5YearAnnualRevenueGrowthRate-Annual:
+          type: number
+        saleOrMaturityOfInvestments-Annual:
+          type: number
+        depreciationAmortization-TTM:
+          type: number
+        tangibleBookValuePerShare-Annual:
+          type: number
+        epsFullyDiluted-Annual:
+          type: number
+        averageDailyVolumeLast20Days-TTM:
+          type: number
+        propertyPlantEquipmentBuildings-TTM:
+          type: number
+        latestCloseAsPercentOf200DayAverage-Annual:
+          type: number
+        tipRanksFourStarsTargetPrice:
+          type: number
+        longTermNoteReceivable-TTM:
+          type: number
+        returnOnAssets-Annual:
+          type: number
+        firstTradeDate:
+          type: string
+        5YearHighPrice-Annual:
+          type: number
+        changeInLongTermDebt-TTM:
+          type: number
+        commonSharesUsedToCalculateEPSFullyDiluted-Annual:
+          type: number
+        earningsGrowth-TTM:
+          type: number
+        5YearAverageDebtEquityRatio-Annual:
+          type: number
+        lowPriceLast3Months-Annual:
+          type: number
+        depreciationDepletionAmortizationCashFlow-TTM:
+          type: number
+        tangibleOtherAssets-Annual:
+          type: number
+        epsSecurity-Annual:
+          type: number
+        longBio-cs:
+          type: string
+        provisionForRisksCharges-TTM:
+          type: number
+        latestCloseAsPercentOf30WeekAverage-Annual:
+          type: number
+        tipRanksFourStarsTargetPriceCurrency:
+          type: string
+        lowPriceLast13Weeks-TTM:
+          type: number
+        returnOnAverageTotalEquity-Annual:
+          type: number
+        accountingStandardsFollowed-TTM:
+          type: string
+        5YearLowPERatio-Annual:
+          type: number
+        currentRevenuePerEmployee-TTM:
+          type: number
+        commonStockParOrCarryValue-Annual:
+          type: number
+        ebitdA-TTM:
+          type: number
+        operatingIncome-Annual:
+          type: number
+        lowPriceLast4Weeks-Annual:
+          type: number
+        depreciationOrDepletion-TTM:
+          type: number
+        totalAssets-Annual:
+          type: number
+        equityInEarningsOfAffiliatesIncome-Annual:
+          type: number
+        averageDailyVolumeLast26Weeks-TTM:
+          type: number
+        purchaseOrSaleOfInvestments-TTM:
+          type: number
+        latestCloseAsPercentOf52WeekHigh-Annual:
+          type: number
+        tipRanksFourStarsAnalystExcessReturn:
+          type: number
+        lowPriceLast26Weeks-TTM:
+          type: number
+        annualSalesLow:
+          type: number
+        receivablesPerDaySales-TTM:
+          type: number
+        5YearLowPrice-Annual:
+          type: number
+        commonDividends-TTM:
+          type: number
+        companyFoundedDate-Annual:
+          type: string
+        ebitdaFromCashFlow-TTM:
+          type: number
+        totalVolumeYTD-Annual:
+          type: number
+        lowPriceLast52Weeks-Annual:
+          type: number
+        dividendExDate-TTM:
+          type: string
+        totalCash-Annual:
+          type: number
+        sharesOutstanding-TTM:
+          type: number
+        longBio-de-de:
+          type: string
+        quickRatio-TTM:
+          type: number
+        latestCloseAsPercentOf52WeekLow-Annual:
+          type: number
+        tipRanksFourStarsAnalystGoodRecommendations:
+          type: number
+        lowPriceLast3Months-TTM:
+          type: number
+        annualSalesMedian:
+          type: number
+        receivablesTurnover-TTM:
+          type: number
+        accountsPayable-Annual:
+          type: number
+        dailyVolumeAsPercentOf10DayAverageVolume-TTM:
+          type: number
+        companyName-Annual:
+          type: string
+        ebitdaMargin-TTM:
+          type: number
+        unusualExpense-Annual:
+          type: number
+        lowPriceLast6Months-Annual:
+          type: number
+        dividendPayoutRatio-TTM:
+          type: number
+        totalCommonEquity-Annual:
+          type: number
+        shareTypeSecurity-TTM:
+          type: string
+        averageDailyVolumeLast2Weeks-TTM:
+          type: number
+        beta24Month-TTM:
+          type: number
+        latestCloseAsPercentOf5DayAverage-Annual:
+          type: number
+        tipRanksFourStarsAnalystName:
+          type: string
+        lowPriceLast4Weeks-TTM:
+          type: number
+        annualSalesStandardDeviation:
+          type: number
+        researchAndDevelopment-TTM:
+          type: number
+        accountsPayableCashFlow-Annual:
+          type: number
+        interestPaidCashFlow-TTM:
+          type: number
+        consolidatedNetIncome-Annual:
+          type: number
+        ebitMargin-TTM:
+          type: number
+        website-Annual:
+          type: string
+        lowPriceLast9Months-Annual:
+          type: number
+        dividendRate-TTM:
+          type: number
+        totalCurrentAssets-Annual:
+          type: number
+        sharesOutstandingCurrent-TTM:
+          type: number
+        localName-de-de:
+          type: string
+        longBio-ru-ru:
+          type: string
+        latestCloseAsPercentOf5YearHigh-Annual:
+          type: number
+        tipRanksFourStarsAnalystPicture:
+          type: string
+        lowPriceLast52Weeks-TTM:
+          type: number
+        annualSalesTimestamp:
+          type: string
+        reservesChange-TTM:
+          type: number
+        accountsReceivableCashFlow-Annual:
+          type: number
+        issuanceOrReductionOfDebtNet-TTM:
+          type: number
+        corporateLocation-Annual:
+          type: string
+        ebitOperatingIncome-TTM:
+          type: number
+        weeklyVolumeAsPercentOfSharesOutstanding-Annual:
+          type: number
+        lowPriceMTD-Annual:
+          type: number
+        dividendsPerShareLTMSecurity-TTM:
+          type: number
+        totalCurrentLiabilities-Annual:
+          type: number
+        shortTermDebt-TTM:
+          type: number
+        averageDailyVolumeLast3Months-TTM:
+          type: number
+        localName-ru-ru:
+          type: string
+        latestCloseAsPercentOf5YearLow-Annual:
+          type: number
+        tipRanksFourStarsAnalystPriceTarget:
+          type: number
+        lowPriceLast6Months-TTM:
+          type: number
+        phoneNumber-TTM:
+          type: string
+        retainedEarnings-TTM:
+          type: number
+        accountsReceivablesDays-Annual:
+          type: number
+        capitalExpendituresFixedAssets-TTM:
+          type: number
+        latestCloseAsPercentOf10WeekAverage-Annual:
+          type: number
+        deferredTaxesInvestmentTaxCredit-Annual:
+          type: number
+        deferredTaxes-TTM:
+          type: number
+        lowPriceYTD-Annual:
+          type: number
+        investorRelationsUrl:
+          type: string
+        totalDebt-Annual:
+          type: number
+        averageDailyPercentPriceChange4Weeks-TTM:
+          type: number
+        longBio-fr-fr:
+          type: string
+        industryNameId:
+          type: number
+        longTermDebtToEquityRatio-Annual:
+          type: number
+        tipRanksFourStarsAnalystRank:
+          type: number
+        lowPriceLast9Months-TTM:
+          type: number
+        preferredDividends-TTM:
+          type: number
+        returnOnAssets-TTM:
+          type: number
+        accountsReceivablesNet-Annual:
+          type: number
+        lastClose-TTM:
+          type: number
+        beta60Month-Annual:
+          type: number
+        deferredTaxLiabilities-Annual:
+          type: number
+        deferredTaxesExcludingInvestmentTaxCredits-TTM:
+          type: number
+        marketCapitalization-Annual:
+          type: number
+        shortBio-th-th:
+          type: string
+        totalDebtToEquityRatio-Annual:
+          type: number
+        5YearAverageNetProfitMargin-TTM:
+          type: number
+        averageDailyVolumeLast4Weeks-TTM:
+          type: number
+        peRatioSecurity-TTM-FiveYearsAgo:
+          type: number
+        nonOperatingIncomeExpense-TTM:
+          type: number
+        tipRanksFourStarsAnalystsSupportingBuy:
+          type: number
+        address1-TTM:
+          type: string
+        preferredStockCarryingValue-TTM:
+          type: number
+        otherSources-Annual:
+          type: number
+        accruedExpenses-Annual:
+          type: number
+        cashDividendsPaid-TTM:
+          type: number
+        bookValue-Annual:
+          type: number
+        depreciationAmortization-Annual:
+          type: number
+        marketCapitalizationFiscal-TTM:
+          type: number
+        marketCapitalizationFiscal-Annual:
+          type: number
+        estimatedQuarterlyEPS:
+          type: number
+        shortBio-ar-ae:
+          type: string
+        5YearAveragePERatio-TTM:
+          type: number
+        localName-fr-fr:
+          type: string
+        peRatioSecurity-TTM-OneYearAgo:
+          type: number
+        numberOfEmployees-TTM:
+          type: number
+        tipRanksFourStarsAnalystsSupportingHold:
+          type: number
+        address2-TTM:
+          type: string
+        pretaxIncome-TTM:
+          type: number
+        otherUses-Annual:
+          type: number
+        accumulatedDepreciation-Annual:
+          type: number
+        lastHigh-TTM:
+          type: number
+        bookValuePerShare-Annual:
+          type: number
+        depreciationDepletionAmortizationCashFlow-Annual:
+          type: number
+        marketCapitalizationFullyDiluted-TTM:
+          type: number
+        marketCapitalizationFullyDiluted-Annual:
+          type: number
+        estimatedQuarterlySales:
+          type: number
+        workingCapitalPerShare-TTM:
+          type: number
+        5YearAveragePreTaxProfitMargin-TTM:
+          type: number
+        averageDailyVolumeLast52Weeks-TTM:
+          type: number
+        sectorNameId:
+          type: number
+        operatingIncome-TTM:
+          type: number
+        tipRanksFourStarsAnalystsSupportingSell:
+          type: number
+        amortizationOfIntangibleAssets-TTM:
+          type: number
+        preTaxInterestCoverageRatio-TTM:
+          type: number
+        pegRatio-Annual:
+          type: number
+        totalEnterpriseValue-TTM:
+          type: number
+        cashEquivalentsGeneric-TTM:
+          type: number
+        businessDescription-Annual:
+          type: string
+        depreciationOrDepletion-Annual:
+          type: number
+        marketCapitalizationSecurity-TTM:
+          type: number
+        marketCapitalizationSecurity-Annual:
+          type: number
+        estimatedYearlyEPS:
+          type: number
+        zipCode-TTM:
+          type: string
+        5YearAverageRAndDAsPercentOfSales-TTM:
+          type: number
+        shortBio-it-it:
+          type: string
+        replayWebcastURL:
+          type: string
+        operatingIncomeAfterUnusualItems-TTM:
+          type: number
+        tipRanksFourStarsAnalystStars:
+          type: number
+        assetTurnover-TTM:
+          type: number
+        preTaxProfitMargin-TTM:
+          type: number
+        peRatio-Annual:
+          type: number
+        totalEquity-TTM:
+          type: number
+        lastLow-TTM:
+          type: number
+        issuanceOrReductionOfDebtNet-Annual:
+          type: number
+        dividendExDate-Annual:
+          type: string
+        minorityInterestExpense-TTM:
+          type: number
+        minorityInterestExpense-Annual:
+          type: number
+        weeklyVolumeAsPercentOfSharesOutstanding-TTM:
+          type: number
+        shortBio-da-dk:
+          type: string
+        averageDailyVolumeLast6Months-TTM:
+          type: number
+        transcriptFiscalYear:
+          type: number
+        operatingLeaseExpense-TTM:
+          type: number
+        tipRanksFourStarsAnalystStockAverageReturn:
+          type: number
+        auditorsOpinion-TTM:
+          type: string
+        priceToBook-TTM:
+          type: number
+        peRatioFiscal-Annual:
+          type: number
+        totalExpenses-TTM:
+          type: number
+        cashFlowPerShare-TTM:
+          type: number
+        lastClose-Annual:
+          type: number
+        tangibleOtherAssets-TTM:
+          type: number
+        miscellaneousFunds-TTM:
+          type: number
+        longTermDebtToTotalCapital-Annual:
+          type: number
+        estimatedEPS:
+          type: number
+        workingCapital-TTM:
+          type: number
+        longBio-da-dk:
+          type: string
+        localName-nl-nl:
+          type: string
+        xDividend:
+          type: number
+        operatingMargin-TTM:
+          type: number
+        issuerLevelCurrency-Annual:
+          type: string
+        grossIncomeMargin-Annual:
+          type: number
+        averageDailyVolumeLast52Weeks-Annual:
+          type: number
+        peRatioSecurity-Annual:
+          type: number
+        totalInvestedCapital-TTM:
+          type: number
+        lastOpen-TTM:
+          type: number
+        lastHigh-Annual:
+          type: number
+        totalAssets-TTM:
+          type: number
+        naicsCode-TTM:
+          type: string
+        longTermNoteReceivable-Annual:
+          type: number
+        isin:
+          type: string
+        longBio-ar-ae:
+          type: string
+        localName-da-dk:
+          type: string
+        peRatio-TTM-FiveYearsAgo:
+          type: number
+        lastLow-Annual:
+          type: number
+        otherAfterTaxAdjustments-TTM:
+          type: number
+        tipRanksFourStarsTotalAnalysts:
+          type: number
+        highPriceLast13Weeks-Annual:
+          type: number
+        returnOnCommonEquity-Annual:
+          type: number
+        percentOfSharesOutstandingHeldByInsiders-Annual:
+          type: number
+        totalInvestmentsAndAdvances-TTM:
+          type: number
+        cashPerShare-TTM:
+          type: number
+        lastOpen-Annual:
+          type: number
+        totalCash-TTM:
+          type: number
+        5YearAverageGrossProfitMargin-Annual:
+          type: number
+        lowPriceLast13Weeks-Annual:
+          type: number
+        estimatedYearlySales:
+          type: number
+        localName-ar-ae:
+          type: string
+        longBio-ms-my:
+          type: string
+        shortBio-nl-nl:
+          type: string
+        lastTradeDate-Annual:
+          type: string
+        otherAssets-TTM:
+          type: number
+        percentPriceChange26Weeks-Annual:
+          type: number
+        industry-TTM:
+          type: string
+        revenuePerShare-Annual:
+          type: number
+        percentPriceChange10Days-Annual:
+          type: number
+        totalInvestmentsBanks-TTM:
+          type: number
+        lastTradeDate-TTM:
+          type: string
+        lastVolume-Annual:
+          type: number
+        totalCommonEquity-TTM:
+          type: number
+        revenueToAssets-TTM:
+          type: number
+        lowPriceLast26Weeks-Annual:
+          type: number
+        sedol:
+          type: string
+        percentPriceChange13Weeks-Annual:
+          type: number
+        localName-ms-my:
+          type: string
+        peRatioFiscal-TTM-ThreeMonthsAgo:
+          type: number
+        latestCloseAsPercentOf10DayAverage-Annual:
+          type: number
+        otherCurrentAssets-TTM:
+          type: number
+        percentPriceChange2Weeks-Annual:
+          type: number
+        inventoriesFinishedGoods-TTM:
+          type: number
+        revenueToAssets-Annual:
+          type: number
+        sectorName-Annual:
+          type: string
+        totalLiabilities-TTM:
+          type: number
+        cashShortTermInvestments-TTM:
+          type: number
+        longBio-th-th:
+          type: string
+        totalCurrentAssets-TTM:
+          type: number
+        saleOfFixedAssetsBusinesses-TTM:
+          type: number
+        totalEquity-Annual:
+          type: number
+        percentPriceChange52Weeks-TTM:
+          type: number
+        securityIsPrimaryIssue-Annual:
+          type: boolean
+        5YearHighPERatio-TTM:
+          type: number
+        longBio-nl-nl:
+          type: string
+        longBio-fi-fi:
+          type: string
+        quarterlySalesHigh:
+          type: number
+        percentPriceChange3Months-Annual:
+          type: number
+        inventoriesProgressPayments-TTM:
+          type: number
+        percentPriceChange6Months-TTM:
+          type: number
+        sellingGeneralAdministrativeExpenses-Annual:
+          type: number
+        totalLiabilitiesStockholdersEquity-TTM:
+          type: number
+        lastVolume-TTM:
+          type: number
+        shortBio-fi-fi:
+          type: string
+        totalCurrentLiabilities-TTM:
+          type: number
+        salesOrRevenue-TTM:
+          type: number
+        otherUses-TTM:
+          type: number
+        percentPriceChange9Months-TTM:
+          type: number
+        returnOnAverageTotalEquity-TTM:
+          type: number
+        5YearHighPrice-TTM:
+          type: number
+        peRatioFiscal-TTM-SixMonthsAgo:
+          type: number
+        localName-th-th:
+          type: string
+        quarterlySalesLow:
+          type: number
+        percentPriceChange4Weeks-Annual:
+          type: number
+        inventoriesRawMaterials-TTM:
+          type: number
+        percentPriceChangeMTD-TTM:
+          type: number
+        returnOnCommonEquity-TTM:
+          type: number
+        200DayMovingAverage-TTM:
+          type: number
+        ceO-TTM:
+          type: string
+        localName-fi-fi:
+          type: string
+        instrumentLevelSector-Annual:
+          type: string
+        sector-TTM:
+          type: string
+        pegRatio-TTM:
+          type: number
+        percentPriceChangeYTD-TTM:
+          type: number
+        revenuePerShare-TTM:
+          type: number
+        5YearLowPERatio-TTM:
+          type: number
+        longBio-it-it:
+          type: string
+        fixedChargeCoverageRatio-TTM:
+          type: number
+        quarterlySalesMedian:
+          type: number
+        percentPriceChange52Weeks-Annual:
+          type: number
+        inventoriesWorkInProgress-TTM:
+          type: number
+        averageDailyVolumeLast6Months-Annual:
+          type: number
+        fundsFromOperations-TTM:
+          type: number
+        30WeekMovingAverage-TTM:
+          type: number
+        latestCloseAsPercentOf10DayAverage-TTM:
+          type: number
+        fixedChargeCoverageRatio-Annual:
+          type: number
+        intangibleAssets-Annual:
+          type: number
+        issuerLevelCurrency-TTM:
+          type: string
+        dividendsPerShareSecurity-Annual:
+          type: number
+        averageDailyVolumeLast9Months-Annual:
+          type: number
+        generalIndustryClassification-TTM:
+          type: string
+        5YearLowPrice-TTM:
+          type: number
+        peRatioFiscal-TTM-OneYearAgo:
+          type: number
+        longBio-vi-vn:
+          type: string
+        quarterlySalesStandardDeviation:
+          type: number
+        5YearAverageTotalDebtEquityRatio-Annual:
+          type: number
+        address1-Annual:
+          type: string
+        averageDailyVolumeLastMonth-Annual:
+          type: number
+        grossIncome-TTM:
+          type: number
+        3YearAnnualCapitalSpendingGrowthRate-TTM:
+          type: number
+        changeInCapitalStock-TTM:
+          type: number
+        localName-vi-vn:
+          type: string
+        interestExpense-Annual:
+          type: number
+        arabesqueESGEnvironment:
+          type: number
+        dividendYieldDaily-Annual:
+          type: number
+        averageDailyVolumeYTD-Annual:
+          type: number
+        grossIncomeMargin-TTM:
+          type: number
+        accountsPayable-TTM:
+          type: number
+        localName-it-it:
+          type: string
+        cusip:
+          type: string
+        quarterlySalesTimestamp:
+          type: string
+        5YearHighPERatio-Annual:
+          type: number
+        address2-Annual:
+          type: string
+        beta-Annual:
+          type: number
+        highPriceLast13Weeks-TTM:
+          type: number
+        3YearAnnualDividendGrowthRate-TTM:
+          type: number
+        averageDailyVolumeLast9Months-TTM:
+          type: number
+        cik:
+          type: string
+        historicDividends:
+          type: array
+          items:
+            type: object
+            properties:
+              DividendAmount:
+                type: number
+              Currency:
+                type: string
+              ExDate:
+                type: string
+              PayDate:
+                type: string
+              RecordDate:
+                type: string
+              DeclaredDate:
+                type: string
+              PaymentFrequency:
+                type: string
+              Type:
+                type: string
+        arabesqueESGGovernance:
+          type: number
+        dividendYieldFiscal-Annual:
+          type: number
+        beta12Month-Annual:
+          type: number
+        sector-Annual:
+          type: string
+        accountsPayableCashFlow-TTM:
+          type: number
+        peRatioFiscal-TTM-FiveYearsAgo:
+          type: number
+        beta24Month-Annual:
+          type: number
+        quarterlySalesUpRevisions:
+          type: number
+        percentPriceChange6Months-Annual:
+          type: number
+        amortizationOfIntangibleAssets-Annual:
+          type: number
+        beta36Month-Annual:
+          type: number
+        quarterlySalesValue:
+          type: number
+        3YearAnnualIncomeGrowthRate-TTM:
+          type: number
+        preTaxInterestCoverageRatio-Annual:
+          type: number
+        peRatio-TTM:
+          type: number
+        marketCapitalizationExcludingNonTradedAndTreasuryIssuerLevel-Annual:
+          type: number
+        arabesqueESGSocial:
+          type: number
+        dividendYieldSecurity-Annual:
+          type: number
+        percentPriceChange4Weeks-TTM:
+          type: number
+        marketCapitalizationExcludingNonTradedIssuerLevel-Annual:
+          type: number
+        accountsReceivableCashFlow-TTM:
+          type: number
+        localName-pt-pt:
+          type: string
+        earningsQuarter:
+          type: string
+          description: earning reports quarter
+        marketCapitalizationExcludingTreasuryIssuerLevel-Annual:
+          type: number
+        percentPriceChange9Months-Annual:
+          type: number
+        assetTurnover-Annual:
+          type: number
+        lastEarningEstimateAverage:
+          type: number
+        leverageRatio-Annual:
+          type: number
+        miscellaneousFunds-Annual:
+          type: number
+        averageDailyVolumeLastMonth-TTM:
+          type: number
+        lastEarningUpdateDate:
+          type: string
+          description: last earning report update date
+        longBusinessDescription-Annual:
+          type: string
+        numberOfEmployees-TTM-OneYearAgo:
+          type: number
+        dollarVolume1Week-Annual:
+          type: number
+        nextEarningDate:
+          type: string
+          description: the next date of the earning reports
+        peRatioSecurity-TTM-ThreeMonthsAgo:
+          type: number
+        accountsReceivablesDays-TTM:
+          type: number
+        auditorsOpinion-Annual:
+          type: string
+        nextEarningDateType:
+          type: string
+          description: earning report date type
+        localName-da:
+          type: string
+        percentPriceChangeMTD-Annual:
+          type: number
+        domicileIndicatorCode-Annual:
+          type: string
+        nextEarningEstimateAverage:
+          type: number
+          description: next earning reports estimate average
+        shortBio-ru-ru:
+          type: string
+        naicsCode-Annual:
+          type: string
+        earningsGrowth-Annual:
+          type: number
+          description: earning reports growth annual
+        nextEarningTime:
+          type: string
+        averageDailyVolumeYTD-TTM:
+          type: number
+        numberOfEmployees-TTM-FiveYearsAgo:
+          type: number
+        ebitdA-Annual:
+          type: number
+        nextEarningsDateQuarter:
+          type: string
+          format: date-time
+          description: next quarter date of earning reports
+        peRatioSecurity-TTM-SixMonthsAgo:
+          type: number
+        accountsReceivablesNet-TTM:
+          type: number
+        ebitdaFromCashFlow-Annual:
+          type: number
+        q1EarningDate:
+          type: string
+          description: The date of the Q1 earnings report
+        localName-ms:
+          type: string
+        percentPriceChangeYTD-Annual:
+          type: number
+        ebitdaMargin-Annual:
+          type: number
+        q2EarningDate:
+          type: string
+        shortBio-pl-pl:
+          type: string
+        netAssetsFromAcquisitions-Annual:
+          type: number
+        ebitMargin-Annual:
+          type: number
+        q3EarningDate:
+          type: string
+        beta-TTM:
+          type: number
+        numberOfEmployees-TTM-SixMonthsAgo:
+          type: number
+        ebitOperatingIncome-Annual:
+          type: number
+        q4EarningDate:
+          type: string
+        deferredTaxes-Annual:
+          type: number
+        accruedExpenses-TTM:
+          type: number
+        netMargin-Annual:
+          type: number
+        annualEPSDownRevisions:
+          type: number
+        localName-zh-tw:
+          type: string
+        phoneNumber-Annual:
+          type: string
+        netMargin1YearGrowthRate-Annual:
+          type: number
+        annualEPSEstimates:
+          type: number
+        longBio-pl-pl:
+          type: string
+        netChangeInCash-Annual:
+          type: number
+        netMargin-TTM:
+          type: number
+        annualEPSHigh:
+          type: number
+        beta12Month-TTM:
+          type: number
+        netInvestingCashFlow-Annual:
+          type: number
+        netMargin1YearGrowthRate-TTM:
+          type: number
+        annualEPSLow:
+          type: number
+        shortTermReceivables-Annual:
+          type: number
+        shortBio-cs-cz:
+          type: string
+        peRatio-TTM-ThreeMonthsAgo:
+          type: number
+        annualEPSMedian:
+          type: number
+        preTaxProfitMargin-Annual:
+          type: number
+        preferredDividends-Annual:
+          type: number
+        totalExpenses-Annual:
+          type: number
+        annualEPSStandardDeviation:
+          type: number
+        localName-pl-pl:
+          type: string
+        netFinancingCashFlow-Annual:
+          type: number
+        totalInvestedCapital-Annual:
+          type: number
+        annualEPSTimestamp:
+          type: string
+        investmentInUnconsolidatedAffiliates-TTM:
+          type: number
+        netOperatingCashFlow-Annual:
+          type: number
+        totalInvestmentsAndAdvances-Annual:
+          type: number
+        annualEPSUpRevisions:
+          type: number
+        sicCode-Annual:
+          type: string
+        longBio-cs-cz:
+          type: string
+        totalInvestmentsBanks-Annual:
+          type: number
+        annualEPSValue:
+          type: number
+        priceToBook-Annual:
+          type: number
+        preferredStockCarryingValue-Annual:
+          type: number
+        totalLiabilities-Annual:
+          type: number
+        annualSalesDownRevisions:
+          type: number
+        longBio-pt-pt:
+          type: string
+        totalVolumeLast3Months-TTM:
+          type: number
+        totalLiabilitiesStockholdersEquity-Annual:
+          type: number
+        annualSalesEstimates:
+          type: number
+        investmentsLongTermReceivables-TTM:
+          type: number
+        netPropertyPlantEquipment-Annual:
+          type: number
+        totalOperatingExpenses-Annual:
+          type: number
+        annualSalesHigh:
+          type: number
+        state-Annual:
+          type: string
+        shortBio-da:
+          type: string
+        totalShareholdersEquity-Annual:
+          type: number
+        pretaxIncome-Annual:
+          type: number
+        priceToBookFiscal-Annual:
+          type: number
+        totalVolumeLast4Weeks-TTM:
+          type: number
+        totalVolume1Week-Annual:
+          type: number
+        nonEquityReserves-Annual:
+          type: number
+        shortBio-pt-pt:
+          type: string
+        shortBio-ms:
+          type: string
+        totalVolumeLast10Days-Annual:
+          type: number
+        nonOperatingExpense-Annual:
+          type: number
+        investorRelationsEmail-TTM:
+          type: string
+        totalVolumeLast52Weeks-TTM:
+          type: number
+        totalVolumeLast12Months-Annual:
+          type: number
+        nonOperatingIncomeExpense-Annual:
+          type: number
+        stateOfIncorporation-Annual:
+          type: string
+        shortBio-ro:
+          type: string
+        totalVolumeLast13Weeks-Annual:
+          type: number
+        numberOfEmployees-Annual:
+          type: number
+        priceToCashFlow-Annual:
+          type: number
+        totalOperatingExpenses-TTM:
+          type: number
+        totalVolumeLast20Days-Annual:
+          type: number
+        localName-cs-cz:
+          type: string
+        stockOptionCompensationExpense-Annual:
+          type: number
+        totalShareholdersEquity-TTM:
+          type: number
+        totalVolumeLast26Weeks-Annual:
+          type: number
+        shortBio-ro-ro:
+          type: string
+        isoCountryCode-TTM:
+          type: string
+        totalVolume1Week-TTM:
+          type: number
+        totalVolumeLast2Weeks-Annual:
+          type: number
+        shortBio-ms-my:
+          type: string
+        extraordinaryItem-Annual:
+          type: number
+        totalVolumeLast10Days-TTM:
+          type: number
+        totalVolumeLast3Months-Annual:
+          type: number
+        localName-ro-ro:
+          type: string
+        priceToFreeCashFlow-Annual:
+          type: number
+        totalVolumeLast12Months-TTM:
+          type: number
+        totalVolumeLast4Weeks-Annual:
+          type: number
+        longBio-ro-ro:
+          type: string
+        extraordinaryItemsIncludingAccountingChange-Annual:
+          type: number
+        totalVolumeLast13Weeks-TTM:
+          type: number
+        totalVolumeLast52Weeks-Annual:
+          type: number
+        totalVolumeLast20Days-TTM:
+          type: number
+        leverageRatio-TTM:
+          type: number
+        totalVolumeLast26Weeks-TTM:
+          type: number
+        totalVolumeLast6Months-Annual:
+          type: number
+        totalVolumeLast2Weeks-TTM:
+          type: number
+        factSetCompanyEntityID-Annual:
+          type: string
+        totalVolumeLast9Months-Annual:
+          type: number
+        priceToSalesFiscal-Annual:
+          type: number
+        totalVolumeMTD-Annual:
+          type: number
+        epsFullyDiluted-TTM:
+          type: number
+        changesInWorkingCapital-TTM:
+          type: number
+        epsSecurity-TTM:
+          type: number
+        beta60Month-TTM:
+          type: number
+        equityInEarningsOfAffiliatesIncome-TTM:
+          type: number
+        city-TTM:
+          type: string
+        deferredTaxesExcludingInvestmentTaxCredits-Annual:
+          type: number
+        bookValue-TTM:
+          type: number
+        sellingGeneralAdministrativeExpensesAndOther-Annual:
+          type: number
+        commonSharesOutstandingSecurity-TTM:
+          type: number
+        sharesHeldByInstitutions-Annual:
+          type: number
+        bookValuePerShare-TTM:
+          type: number
+        sharesNumberOfCloselyHeld-Annual:
+          type: number
+        commonSharesUsedToCalculateEPSFullyDiluted-TTM:
+          type: number
+        sharesOutstanding-Annual:
+          type: number
+        businessDescription-TTM:
+          type: string
+        sharesOutstandingCurrent-Annual:
+          type: number
+        commonStockParOrCarryValue-TTM:
+          type: number
+        shareTypeSecurity-Annual:
+          type: string
+        priceToTangibleBookFiscal-Annual:
+          type: number
+        shortTermDebt-Annual:
+          type: number
+        companyFoundedDate-TTM:
+          type: string
+        faxNumber-Annual:
+          type: string
+        priceToTangibleBookValue-Annual:
+          type: number
+        filingStatus-Annual:
+          type: string
+        companyName-TTM:
+          type: string
+        fiscalPeriodEndDate-Annual:
+          type: string
+        propertyPlantEquipmentBuildings-Annual:
+          type: number
+        fiscalPeriodLengthDays-Annual:
+          type: number
+        averageDailyVolumeLast2Weeks-Annual:
+          type: number
+        fiscalPeriodStartDate-Annual:
+          type: string
+        provisionForRisksCharges-Annual:
+          type: number
+        float-Annual:
+          type: number
+        averageDailyVolumeLast3Months-Annual:
+          type: number
+        floatAsPercentOfSharesOutstanding-Annual:
+          type: number
+        purchaseOrSaleOfInvestments-Annual:
+          type: number
+        averageDailyVolumeLast4Weeks-Annual:
+          type: number
+        earningConfirmationDate:
+          type: string
+        earningEstimateChangeAverage:
+          type: number
+        dateOf52WeekHigh-TTM:
+          type: string
+        dateOf52WeekLow-TTM:
+          type: string
+        daysSalesOutstanding-TTM:
+          type: number
+        daysSalesOutstandingTimeWeighted-TTM:
+          type: number
+        averageDailyVolumeLast12Months-Annual:
+          type: number
+        averageDailyVolumeLast13Weeks-Annual:
+          type: number
+        averageDailyVolumeLast20Days-Annual:
+          type: number
+        averageDailyVolumeLast26Weeks-Annual:
+          type: number
+        popularityUniques:
+          type: number
+        holdingPct:
+          type: number
+        buyHoldingPct:
+          type: number
+        sellHoldingPct:
+          type: number
+        buyPctChange24Hours:
+          type: number
+        absBuyPctChange24Hours:
+          type: number
+        institutionalHoldingPct:
+          type: number
+        dividendRatePercentage:
+          type: number
+        marketCapInUSD:
+          type: number
+        marketCapClassifications:
+          type: string
+        daysSinceFirstTrade:
+          type: number
+        daysTillNextEarningReport:
+          type: number
+          description: Number of days till next earnings report
+        enterpriseValuetoSales:
+          type: number
+        enterpriseValuetoEBITDA:
+          type: number
+        netProfitMargin:
+          type: number
+        enterpriseValuetoOperCashflow:
+          type: number
+        returnOnInvestedCapital:
+          type: number
+        volumeRateOfChange10Days:
+          type: number
+        volumeRateOfChange4Weeks:
+          type: number
+        volumeRateOfChange3Months:
+          type: number
+        volumeRateOfChange6Months:
+          type: number
+        epsGrowth3Months:
+          type: number
+        epsGrowth1Year:
+          type: number
+        epsGrowth5Years:
+          type: number
+        normalizedESGScore:
+          type: number
+        daystilldividendXdate:
+          type: number
+        liveTipranksTargetUpside:
+          type: number
+        liveTipranksTargetUpsideAbsolute:
+          type: number
+        absBuyPctChange24Hours-Industry-RankDesc:
+          type: number
+        buyPctChange24Hours-Industry-RankDesc:
+          type: number
+        holdingPct-Industry-RankDesc:
+          type: number
+        tipRanksFourStarsTotalAnalysts-Industry-RankDesc:
+          type: number
+        dividendYieldDaily-TTM-Industry-RankAsc:
+          type: number
+        dividendYieldDaily-TTM-Industry-RankDesc:
+          type: number
+        arabesqueESGTotal-Industry-Avg:
+          type: number
+        arabesqueESGTotal-Industry-RankAsc:
+          type: number
+        arabesqueESGTotal-Industry-RankDesc:
+          type: number
+        arabesqueESGTotal-Industry-TotalItems:
+          type: number
+        traders14DayChange-Industry-RankAsc:
+          type: number
+        traders14DayChange-Industry-RankDesc:
+          type: number
+        traders14DayChange-Industry-TotalItems:
+          type: number
+        traders30DayChange-Industry-RankAsc:
+          type: number
+        traders30DayChange-Industry-RankDesc:
+          type: number
+        traders30DayChange-Industry-TotalItems:
+          type: number
+        popularityUniques-Industry-RankAsc:
+          type: number
+        popularityUniques-Industry-RankDesc:
+          type: number
+        traders7DayChange-Industry-RankAsc:
+          type: number
+        traders7DayChange-Industry-RankDesc:
+          type: number
+        traders7DayChange-Industry-TotalItems:
+          type: number
+        peRatio-TTM-Industry-Avg:
+          type: number
+        peRatio-TTM-Industry-RankAsc:
+          type: number
+        peRatio-TTM-Industry-RankDesc:
+          type: number
+        peRatio-TTM-Industry-TotalItems:
+          type: number
+        absBuyPctChange24Hours-Sector-RankDesc:
+          type: number
+        buyPctChange24Hours-Sector-RankDesc:
+          type: number
+        holdingPct-Sector-RankDesc:
+          type: number
+        tipRanksFourStarsTotalAnalysts-Sector-RankDesc:
+          type: number
+        dividendYieldDaily-TTM-Sector-RankAsc:
+          type: number
+        dividendYieldDaily-TTM-Sector-RankDesc:
+          type: number
+        arabesqueESGTotal-Sector-Avg:
+          type: number
+        arabesqueESGTotal-Sector-RankAsc:
+          type: number
+        arabesqueESGTotal-Sector-RankDesc:
+          type: number
+        arabesqueESGTotal-Sector-TotalItems:
+          type: number
+        traders14DayChange-Sector-RankAsc:
+          type: number
+        traders14DayChange-Sector-RankDesc:
+          type: number
+        traders14DayChange-Sector-TotalItems:
+          type: number
+        traders30DayChange-Sector-RankAsc:
+          type: number
+        traders30DayChange-Sector-RankDesc:
+          type: number
+        traders30DayChange-Sector-TotalItems:
+          type: number
+        popularityUniques-Sector-RankAsc:
+          type: number
+        popularityUniques-Sector-RankDesc:
+          type: number
+        traders7DayChange-Sector-RankAsc:
+          type: number
+        traders7DayChange-Sector-RankDesc:
+          type: number
+        traders7DayChange-Sector-TotalItems:
+          type: number
+        peRatio-TTM-Sector-Avg:
+          type: number
+        peRatio-TTM-Sector-RankAsc:
+          type: number
+        peRatio-TTM-Sector-RankDesc:
+          type: number
+        peRatio-TTM-Sector-TotalItems:
+          type: number
+        absBuyPctChange24Hours-System-RankDesc:
+          type: number
+        buyPctChange24Hours-System-RankDesc:
+          type: number
+        holdingPct-System-RankDesc:
+          type: number
+        traders14DayChange-System-RankAsc:
+          type: number
+        traders14DayChange-System-RankDesc:
+          type: number
+        traders14DayChange-System-TotalItems:
+          type: number
+        traders30DayChange-System-RankAsc:
+          type: number
+        traders30DayChange-System-RankDesc:
+          type: number
+        traders30DayChange-System-TotalItems:
+          type: number
+        popularityUniques-System-RankAsc:
+          type: number
+        popularityUniques-System-RankDesc:
+          type: number
+        traders7DayChange-System-RankAsc:
+          type: number
+        traders7DayChange-System-RankDesc:
+          type: number
+        traders7DayChange-System-TotalItems:
+          type: number
+        tipRanksFourStarsTotalAnalysts-System-RankDesc:
+          type: number
+        dividendYieldDaily-TTM-System-RankAsc:
+          type: number
+        dividendYieldDaily-TTM-System-RankDesc:
+          type: number
+        arabesqueESGTotal-System-Avg:
+          type: number
+        arabesqueESGTotal-System-RankAsc:
+          type: number
+        arabesqueESGTotal-System-RankDesc:
+          type: number
+        arabesqueESGTotal-System-TotalItems:
+          type: number
+        peRatio-TTM-System-Avg:
+          type: number
+        peRatio-TTM-System-RankAsc:
+          type: number
+        peRatio-TTM-System-RankDesc:
+          type: number
+        peRatio-TTM-System-TotalItems:
+          type: number
+    Country:
+      type: object
+      properties:
+        countries:
+          type: array
+          items:
+            type: object
+            properties:
+              abbreviation:
+                type: string
+              countryId:
+                type: number
+              isoCode:
+                type: string
+              longAbbreviation:
+                type: string
+              name:
+                type: string
+              phonePrefix:
+                type: string
+              riskGroupID:
+                type: number

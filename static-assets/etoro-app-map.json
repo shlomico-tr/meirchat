@@ -1,0 +1,173 @@
+{
+    "description": "this file contains the most important paths of the https://www.etoro.com web app and their descriptions",
+    "paths": [
+        {
+            "path": "/",
+            "description": "Home page"
+        },
+        {
+            "path": "/watchlists",
+            "description": "Watchlist page where user can add or remove instruments or people that he follows"
+        },
+        {
+            "path": "/portfolio/overview",
+            "description": "My portfolio page"
+        },
+        {
+            "path": "/settings",
+            "description": "General settings page"
+        },
+        {
+            "path": "settings/general",
+            "description": "User can: 1. select the default home page 2.change language 3. update his currency 4. optout in or out"
+        },
+        {
+            "path": "settings/trade",
+            "description": "User can edit his trading settings"
+        },
+        {
+            "path": "/settings/notifications",
+            "description": "User can control his email or push notification settings"
+        },
+        {
+            "path": "/settings/account",
+            "description": "User can set his two factor, update password, email or phone and user can see his account statement"
+        },
+        {
+            "path": "/settings/privacy",
+            "description": "User can change his privacy settings such as: private account mode, show or hide his full name"
+        },
+        {
+            "path": "/my/events",
+            "description": "User can see earning reports and dividend payments dates"
+        },
+        {
+            "path": "/withdraw",
+            "description": "User can withdraw money from his account"
+        },
+        {
+            "path": "/deposit",
+            "description": "User can deposit money to his account"
+        },
+        {
+            "path": "/learn-more",
+            "description": "Help center page"
+        },
+        {
+            "path": "/invite",
+            "description": "Invite friend or refer a friend, need to be opened in new tab"
+        },
+        {
+            "path": "/discover",
+            "description": "Discovery general page for markets and people"
+        },
+        {
+            "path": "/discover/markets/stocks",
+            "description": "Discover stocks page"
+        },
+        {
+            "path": "/discover/markets/cryptocurrencies",
+            "description": "Discover cryptocurrencies page"
+        },
+        {
+            "path": "/discover/markets/indices",
+            "description": "Discover indices page"
+        },
+        {
+            "path": "/discover/markets/commodities",
+            "description": "Discover commodities page"
+        },
+        {
+            "path": "/discover/markets/currencies",
+            "description": "Discover currencies page"
+        },
+        {
+            "path": "/discover/markets/etf",
+            "description": "Discover ETF page"
+        },
+        {
+            "path": "/discover/smartportfolios",
+            "description": "Discover funds page"
+        },
+        {
+            "path": "/discover/people",
+            "description": "Discover people page, user can search even more specific people by adding a querystring to discover people path."
+        },
+        {
+            "path": "/markets/[SymbolFull]",
+            "description": "Market page paths. For [SymbolFull] where [SymbolFull] will be replaced by symbol the user request. User can see default market page and its news feed and make discussionswith other users."
+        },
+        {
+            "path": "/markets/[SymbolFull]/stats",
+            "description": "Market stats page"
+        },
+        {
+            "path": "/markets/[SymbolFull]/chart",
+            "description": "Market chart and trading tools to analyze market data"
+        },
+        {
+            "path": "/markets/[SymbolFull]/news",
+            "description": "User can read latest news"
+        },
+        {
+            "path": "/people/[Username]",
+            "description": "User page for [Username] where [Username] will be replace with the user request username."
+        },
+        {
+            "path": "/people/[Username]/stats",
+            "description": "User stats page"
+        },
+        {
+            "path": "/people/[Username]/portfolio",
+            "description": "User portfolio page"
+        },
+        {
+            "path": "/people/[Username]/chart",
+            "description": "User chart page"
+        },
+        {
+            "path": "/app/trade-shortcut/pricealert?symbol=[SymbolFull]",
+            "description": "User can set price alerts replace the [SymbolFull] with the symbol the user request to set the alert for."
+        },
+        {
+            "path": "/academy",
+            "description": "Main page for academy"
+        },
+        {
+            "path": "/academy/stocks",
+            "description": "Academy stocks page"
+        },
+        {
+            "path": "/academy/crypto",
+            "description": "Academy crypto page"
+        },
+        {
+            "path": "/academy/etoro-basics/",
+            "description": "For etoro basics questions"
+        },
+        {
+            "path": "/academy/summer-school",
+            "description": "Has answers for most investing questions"
+        },
+        {
+            "path": "/investing/investing-101",
+            "description": "Has different investing courses and guides"
+        },
+        {
+            "path": "/academy/how-to-start-investing-quickly/",
+            "description": "Beginners guide to start investing quickly"
+        },
+        {
+            "path": "/academy/beginners/",
+            "description": "Beginners advanced level investing resources"
+        },
+        {
+            "path": "/academy/advanced/",
+            "description": "Advanced level investing resources"
+        },
+        {
+            "path": "/customer-service/",
+            "description": "Advanced level investing resources"
+        }
+    ]
+}

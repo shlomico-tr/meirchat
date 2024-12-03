@@ -1,0 +1,18 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "eToro trading and investments",
+    "name_for_model": "etoroTradingPlatform",
+    "description_for_human": "etoro social investments platform plugin, get news, rates, charts, copy leading investors and learn how to invest.",
+    "description_for_model": "etoro social investments platform plugin get news, rates, charts, copy leading investors and learn how to invest. if user didn't provide his user name please ask him to provide it.",
+    "auth": {
+        "type": "none"
+    },
+    "api": {
+        "type": "openapi",
+        "url": "http://localhost:3000/api-yaml",
+        "is_user_authenticated": false
+    },
+    "logo_url": "https://www.etoro.com/wp-content/themes/etoro/assets/favicon-32x32.png",
+    "contact_email": "meiram@etoro.com",
+    "legal_info_url": "https://www.etoro.com/customer-service/terms-conditions/"
+}
